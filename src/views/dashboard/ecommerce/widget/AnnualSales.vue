@@ -1,16 +1,20 @@
 <template>
   <div class="card art-custom-card yearly-card">
     <div class="card-header">
-      <p class="title">年度销售额</p>
-      <p class="subtitle">按季度统计</p>
+      <p class="title">
+        年度销售额
+      </p>
+      <p class="subtitle">
+        按季度统计
+      </p>
     </div>
 
     <ArtBarChart
-      :showAxisLabel="false"
-      :showAxisLine="false"
-      :showSplitLine="false"
+      :show-axis-label="false"
+      :show-axis-line="false"
+      :show-split-line="false"
       :data="[50, 80, 50, 90, 60, 70, 50]"
-      barWidth="26px"
+      bar-width="26px"
       height="calc(100% - 155px)"
     />
     <div class="icon-text-widget">

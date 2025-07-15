@@ -1,8 +1,9 @@
-import axios, { InternalAxiosRequestConfig, AxiosRequestConfig, AxiosResponse } from 'axios'
-import { useUserStore } from '@/store/modules/user'
-import { ApiStatus } from './status'
-import { HttpError, handleError, showError } from './error'
+import type { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
+import axios from 'axios'
 import { $t } from '@/locales'
+import { useUserStore } from '@/store/modules/user'
+import { handleError, HttpError, showError } from './error'
+import { ApiStatus } from './status'
 
 // 常量定义
 const REQUEST_TIMEOUT = 15000 // 请求超时时间(毫秒)
@@ -21,11 +22,11 @@ const axiosInstance = axios.create({
   timeout: REQUEST_TIMEOUT, // 请求超时时间(毫秒)
   baseURL: VITE_API_URL, // API地址
   withCredentials: VITE_WITH_CREDENTIALS === 'true', // 是否携带cookie，默认关闭
-  transformRequest: [(data) => JSON.stringify(data)], // 请求数据转换为 JSON 字符串
-  validateStatus: (status) => status >= 200 && status < 300, // 只接受 2xx 的状态码
+  transformRequest: [data => JSON.stringify(data)], // 请求数据转换为 JSON 字符串
+  validateStatus: status => status >= 200 && status < 300, // 只接受 2xx 的状态码
   headers: {
     get: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
-    post: { 'Content-Type': 'application/json;charset=utf-8' }
+    post: { 'Content-Type': 'application/json;charset=utf-8' },
   },
   transformResponse: [
     (data, headers) => {
@@ -33,13 +34,14 @@ const axiosInstance = axios.create({
       if (contentType && contentType.includes('application/json')) {
         try {
           return JSON.parse(data)
-        } catch {
+        }
+        catch {
           return data
         }
       }
       return data
-    }
-  ]
+    },
+  ],
 })
 
 // 请求拦截器
@@ -58,7 +60,7 @@ axiosInstance.interceptors.request.use(
   (error) => {
     showError(new HttpError($t('httpMsg.requestConfigError'), ApiStatus.error))
     return Promise.reject(error)
-  }
+  },
 )
 
 // 响应拦截器
@@ -78,19 +80,20 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     return Promise.reject(handleError(error))
-  }
+  },
 )
 
 // 请求重试函数
 async function retryRequest<T>(
   config: ExtendedAxiosRequestConfig,
-  retries: number = MAX_RETRIES
+  retries: number = MAX_RETRIES,
 ): Promise<T> {
   try {
     return await request<T>(config)
-  } catch (error) {
+  }
+  catch (error) {
     if (retries > 0 && error instanceof HttpError && shouldRetry(error.code)) {
-      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY))
       return retryRequest<T>(config, retries - 1)
     }
     throw error
@@ -104,7 +107,7 @@ function shouldRetry(statusCode: number): boolean {
     ApiStatus.internalServerError,
     ApiStatus.badGateway,
     ApiStatus.serviceUnavailable,
-    ApiStatus.gatewayTimeout
+    ApiStatus.gatewayTimeout,
   ].includes(statusCode)
 }
 
@@ -121,7 +124,8 @@ async function request<T = any>(config: ExtendedAxiosRequestConfig): Promise<T> 
   try {
     const res = await axiosInstance.request<Api.Http.BaseResponse<T>>(config)
     return res.data.data as T
-  } catch (error) {
+  }
+  catch (error) {
     if (error instanceof HttpError) {
       // 根据配置决定是否显示错误消息
       const showErrorMessage = config.showErrorMessage !== false
@@ -147,11 +151,11 @@ const api = {
   },
   request<T>(config: ExtendedAxiosRequestConfig): Promise<T> {
     return retryRequest<T>({ ...config })
-  }
+  },
 }
 
 // 退出登录函数
-const logOut = (): void => {
+function logOut(): void {
   setTimeout(() => {
     useUserStore().logOut()
   }, LOGOUT_DELAY)

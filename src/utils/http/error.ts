@@ -1,7 +1,7 @@
-import { AxiosError } from 'axios'
+import type { AxiosError } from 'axios'
 import { ElMessage } from 'element-plus'
-import { ApiStatus } from './status'
 import { $t } from '@/locales'
+import { ApiStatus } from './status'
 
 // 错误响应接口
 export interface ErrorResponse {
@@ -36,7 +36,7 @@ export class HttpError extends Error {
       data?: unknown
       url?: string
       method?: string
-    }
+    },
   ) {
     super(message)
     this.name = 'HttpError'
@@ -55,7 +55,7 @@ export class HttpError extends Error {
       timestamp: this.timestamp,
       url: this.url,
       method: this.method,
-      stack: this.stack
+      stack: this.stack,
     }
   }
 }
@@ -65,7 +65,7 @@ export class HttpError extends Error {
  * @param status 错误状态码
  * @returns 错误消息
  */
-const getErrorMessage = (status: number): string => {
+function getErrorMessage(status: number): string {
   const errorMap: Record<number, string> = {
     [ApiStatus.unauthorized]: 'httpMsg.unauthorized',
     [ApiStatus.forbidden]: 'httpMsg.forbidden',
@@ -75,7 +75,7 @@ const getErrorMessage = (status: number): string => {
     [ApiStatus.internalServerError]: 'httpMsg.internalServerError',
     [ApiStatus.badGateway]: 'httpMsg.badGateway',
     [ApiStatus.serviceUnavailable]: 'httpMsg.serviceUnavailable',
-    [ApiStatus.gatewayTimeout]: 'httpMsg.gatewayTimeout'
+    [ApiStatus.gatewayTimeout]: 'httpMsg.gatewayTimeout',
   }
 
   return $t(errorMap[status] || 'httpMsg.internalServerError')
@@ -101,7 +101,7 @@ export function handleError(error: AxiosError<ErrorResponse>): never {
   if (!error.response) {
     throw new HttpError($t('httpMsg.networkError'), ApiStatus.error, {
       url: requestConfig?.url,
-      method: requestConfig?.method?.toUpperCase()
+      method: requestConfig?.method?.toUpperCase(),
     })
   }
 
@@ -112,7 +112,7 @@ export function handleError(error: AxiosError<ErrorResponse>): never {
   throw new HttpError(message, statusCode || ApiStatus.error, {
     data: error.response.data,
     url: requestConfig?.url,
-    method: requestConfig?.method?.toUpperCase()
+    method: requestConfig?.method?.toUpperCase(),
   })
 }
 
@@ -134,6 +134,6 @@ export function showError(error: HttpError, showMessage: boolean = true): void {
  * @param error 错误对象
  * @returns 是否为 HttpError 类型
  */
-export const isHttpError = (error: unknown): error is HttpError => {
+export function isHttpError(error: unknown): error is HttpError {
   return error instanceof HttpError
 }

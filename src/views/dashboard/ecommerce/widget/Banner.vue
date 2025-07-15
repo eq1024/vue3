@@ -1,23 +1,34 @@
+<script setup lang="ts">
+import bannerCover from '@imgs/login/lf_icon2.webp'
+import { useUserStore } from '@/store/modules/user'
+
+const userStore = useUserStore()
+
+const userInfo = computed(() => userStore.getUserInfo)
+
+function handleBannerClick() {}
+</script>
+
 <template>
   <ArtBasicBanner
     class="banner"
     height="13.3rem"
     :title="`欢迎回来 ${userInfo.userName}`"
-    backgroundColor="var(--el-color-primary-light-9)"
-    titleColor="var(--art-gray-900)"
+    background-color="var(--el-color-primary-light-9)"
+    title-color="var(--art-gray-900)"
     :decoration="false"
-    :meteorConfig="{
+    :meteor-config="{
       enabled: true,
-      count: 10
+      count: 10,
     }"
-    :buttonConfig="{
+    :button-config="{
       show: false,
-      text: ''
+      text: '',
     }"
-    :imageConfig="{
+    :image-config="{
       src: bannerCover,
       width: '18rem',
-      bottom: '-7.5rem'
+      bottom: '-7.5rem',
     }"
     @click="handleBannerClick"
   >
@@ -33,28 +44,22 @@
           />
           <i class="iconfont-sys text-success">&#xe8d5;</i>
         </p>
-        <p class="subtitle">今日销售额</p>
+        <p class="subtitle">
+          今日销售额
+        </p>
       </div>
       <div class="item">
         <p class="title">
           <ArtCountTo class="number box-title" :target="35" :duration="1500" suffix="%" />
           <i class="iconfont-sys text-success">&#xe8d5;</i>
         </p>
-        <p class="subtitle">较昨日</p>
+        <p class="subtitle">
+          较昨日
+        </p>
       </div>
     </div>
   </ArtBasicBanner>
 </template>
-
-<script setup lang="ts">
-  import bannerCover from '@imgs/login/lf_icon2.webp'
-  import { useUserStore } from '@/store/modules/user'
-  const userStore = useUserStore()
-
-  const userInfo = computed(() => userStore.getUserInfo)
-
-  const handleBannerClick = () => {}
-</script>
 
 <style lang="scss" scoped>
   .banner {

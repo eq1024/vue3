@@ -1,7 +1,20 @@
+<script setup lang="ts">
+import AppConfig from '@/config'
+import { WEB_LINKS } from '@/utils/constants'
+
+const systemName = AppConfig.systemInfo.name
+
+function goPage(url: string) {
+  window.open(url)
+}
+</script>
+
 <template>
   <div class="card about-project art-custom-card">
     <div>
-      <h2 class="box-title">关于项目</h2>
+      <h2 class="box-title">
+        关于项目
+      </h2>
       <p>{{ systemName }} 是一款专注于用户体验和视觉设计的后台管理系统模版</p>
       <p>使用了 Vue3、TypeScript、Vite、Element Plus 等前沿技术</p>
 
@@ -24,20 +37,9 @@
         </div>
       </div>
     </div>
-    <img class="right-img" src="@imgs/draw/draw1.png" alt="draw1" />
+    <img class="right-img" src="@imgs/draw/draw1.png" alt="draw1">
   </div>
 </template>
-
-<script setup lang="ts">
-  import AppConfig from '@/config'
-  import { WEB_LINKS } from '@/utils/constants'
-
-  const systemName = AppConfig.systemInfo.name
-
-  const goPage = (url: string) => {
-    window.open(url)
-  }
-</script>
 
 <style lang="scss" scoped>
   .about-project {

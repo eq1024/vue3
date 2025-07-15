@@ -1,10 +1,10 @@
+import type { MenuThemeType } from '@/types/store'
 import { defineStore } from 'pinia'
-import { ref, computed, nextTick } from 'vue'
-import { MenuThemeType } from '@/types/store'
-import AppConfig from '@/config'
-import { SystemThemeEnum, MenuThemeEnum, MenuTypeEnum, ContainerWidthEnum } from '@/enums/appEnum'
-import { setElementThemeColor } from '@/utils/ui'
+import { computed, nextTick, ref } from 'vue'
 import { useCeremony } from '@/composables/useCeremony'
+import AppConfig from '@/config'
+import { ContainerWidthEnum, MenuThemeEnum, MenuTypeEnum, SystemThemeEnum } from '@/enums/appEnum'
+import { setElementThemeColor } from '@/utils/ui'
 
 const { defaultMenuWidth, defaultCustomRadius, defaultTabStyle } = AppConfig.systemSetting
 
@@ -90,10 +90,11 @@ export const useSettingStore = defineStore(
      * 根据当前主题类型和暗色模式返回对应的主题配置
      */
     const getMenuTheme = computed((): MenuThemeType => {
-      const list = AppConfig.themeList.filter((item) => item.theme === menuThemeType.value)
+      const list = AppConfig.themeList.filter(item => item.theme === menuThemeType.value)
       if (isDark.value) {
         return AppConfig.darkMenuStyles[0]
-      } else {
+      }
+      else {
         return list[0]
       }
     })
@@ -109,14 +110,14 @@ export const useSettingStore = defineStore(
      * 获取菜单展开宽度
      */
     const getMenuOpenWidth = computed((): string => {
-      return menuOpenWidth.value + 'px' || defaultMenuWidth + 'px'
+      return `${menuOpenWidth.value}px` || `${defaultMenuWidth}px`
     })
 
     /**
      * 获取自定义圆角
      */
     const getCustomRadius = computed((): string => {
-      return customRadius.value + 'rem' || defaultCustomRadius + 'rem'
+      return `${customRadius.value}rem` || `${defaultCustomRadius}rem`
     })
 
     /**
@@ -124,7 +125,7 @@ export const useSettingStore = defineStore(
      * 根据当前日期和节日日期判断是否显示烟花效果
      */
     const isShowFireworks = computed((): boolean => {
-      return festivalDate.value === useCeremony().currentFestivalData.value?.date ? false : true
+      return festivalDate.value !== useCeremony().currentFestivalData.value?.date
     })
 
     /**
@@ -415,13 +416,13 @@ export const useSettingStore = defineStore(
       setholidayFireworksLoaded,
       setShowFestivalText,
       setFestivalDate,
-      setDualMenuShowText
+      setDualMenuShowText,
     }
   },
   {
     persist: {
       key: 'setting',
-      storage: localStorage
-    }
-  }
+      storage: localStorage,
+    },
+  },
 )

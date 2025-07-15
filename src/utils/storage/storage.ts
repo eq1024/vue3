@@ -1,8 +1,8 @@
 import { ElMessage } from 'element-plus'
 import { router } from '@/router'
+import { RoutesAlias } from '@/router/routesAlias'
 import { useUserStore } from '@/store/modules/user'
 import { StorageConfig } from '@/utils/storage/storage-config'
-import { RoutesAlias } from '@/router/routesAlias'
 
 /**
  * 存储兼容性管理器
@@ -34,7 +34,7 @@ class StorageCompatibilityManager {
     const currentVersionPattern = StorageConfig.createCurrentVersionPattern()
 
     return storageKeys.some(
-      (key) => currentVersionPattern.test(key) && localStorage.getItem(key) !== null
+      key => currentVersionPattern.test(key) && localStorage.getItem(key) !== null,
     )
   }
 
@@ -45,7 +45,7 @@ class StorageCompatibilityManager {
     const storageKeys = Object.keys(localStorage)
     const versionPattern = StorageConfig.createVersionPattern()
 
-    return storageKeys.some((key) => versionPattern.test(key) && localStorage.getItem(key) !== null)
+    return storageKeys.some(key => versionPattern.test(key) && localStorage.getItem(key) !== null)
   }
 
   /**
@@ -55,7 +55,8 @@ class StorageCompatibilityManager {
     try {
       const systemStorage = this.getSystemStorage()
       return systemStorage || {}
-    } catch (error) {
+    }
+    catch (error) {
       console.warn('[Storage] 解析旧格式存储数据失败:', error)
       return {}
     }
@@ -69,7 +70,7 @@ class StorageCompatibilityManager {
       type: 'error',
       offset: 40,
       duration: 5000,
-      message: '系统检测到本地数据异常，请重新登录系统恢复使用！'
+      message: '系统检测到本地数据异常，请重新登录系统恢复使用！',
     })
   }
 
@@ -83,7 +84,8 @@ class StorageCompatibilityManager {
         useUserStore().logOut()
         router.push(RoutesAlias.Login)
         console.info('[Storage] 已执行系统登出')
-      } catch (error) {
+      }
+      catch (error) {
         console.error('[Storage] 系统登出失败:', error)
       }
     }, StorageConfig.LOGOUT_DELAY)
@@ -136,7 +138,8 @@ class StorageCompatibilityManager {
 
       console.debug('[Storage] 发现旧版本存储数据')
       return true
-    } catch (error) {
+    }
+    catch (error) {
       console.error('[Storage] 存储数据验证失败:', error)
       this.handleStorageError()
       return false
@@ -177,7 +180,8 @@ class StorageCompatibilityManager {
 
       console.warn('[Storage] 存储兼容性检查失败')
       return false
-    } catch (error) {
+    }
+    catch (error) {
       console.error('[Storage] 兼容性检查异常:', error)
       return false
     }

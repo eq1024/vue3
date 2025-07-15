@@ -1,7 +1,7 @@
-import { useSettingStore } from '@/store/modules/setting'
-import { SystemThemeEnum } from '@/enums/appEnum'
+import type { SystemThemeTypes } from '@/types/store'
 import AppConfig from '@/config'
-import { SystemThemeTypes } from '@/types/store'
+import { SystemThemeEnum } from '@/enums/appEnum'
+import { useSettingStore } from '@/store/modules/setting'
 import { getDarkColor, getLightColor } from '@/utils/ui'
 
 export function useTheme() {
@@ -47,7 +47,7 @@ export function useTheme() {
     for (let i = 1; i <= 9; i++) {
       document.documentElement.style.setProperty(
         `--el-color-primary-light-${i}`,
-        isDark ? `${getDarkColor(primary, i / 10)}` : `${getLightColor(primary, i / 10)}`
+        isDark ? `${getDarkColor(primary, i / 10)}` : `${getLightColor(primary, i / 10)}`,
       )
     }
 
@@ -66,7 +66,8 @@ export function useTheme() {
   const setSystemAutoTheme = () => {
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setSystemTheme(SystemThemeEnum.DARK, SystemThemeEnum.AUTO)
-    } else {
+    }
+    else {
       setSystemTheme(SystemThemeEnum.LIGHT, SystemThemeEnum.AUTO)
     }
   }
@@ -75,7 +76,8 @@ export function useTheme() {
   const switchThemeStyles = (theme: SystemThemeEnum) => {
     if (theme === SystemThemeEnum.AUTO) {
       setSystemAutoTheme()
-    } else {
+    }
+    else {
       setSystemTheme(theme)
     }
   }
@@ -83,6 +85,6 @@ export function useTheme() {
   return {
     setSystemTheme,
     setSystemAutoTheme,
-    switchThemeStyles
+    switchThemeStyles,
   }
 }

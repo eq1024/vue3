@@ -1,14 +1,14 @@
-import { ref, computed, watch } from 'vue'
-import { useSettingStore } from '@/store/modules/setting'
-import { storeToRefs } from 'pinia'
 import { useWindowSize } from '@vueuse/core'
-import AppConfig from '@/config'
-import { SystemThemeEnum, MenuTypeEnum } from '@/enums/appEnum'
-import { mittBus } from '@/utils/sys'
-import { useTheme } from '@/composables/useTheme'
+import { storeToRefs } from 'pinia'
+import { computed, ref, watch } from 'vue'
 import { useCeremony } from '@/composables/useCeremony'
-import { useSettingsState } from './useSettingsState'
+import { useTheme } from '@/composables/useTheme'
+import AppConfig from '@/config'
+import { MenuTypeEnum, SystemThemeEnum } from '@/enums/appEnum'
+import { useSettingStore } from '@/store/modules/setting'
+import { mittBus } from '@/utils/sys'
 import { useSettingsHandlers } from './useSettingsHandlers'
+import { useSettingsState } from './useSettingsState'
 
 /**
  * 设置面板核心逻辑管理
@@ -48,7 +48,8 @@ export function useSettingsPanel() {
     const initSystemTheme = () => {
       if (systemThemeMode.value === SystemThemeEnum.AUTO) {
         setSystemAutoTheme()
-      } else {
+      }
+      else {
         setSystemTheme(systemThemeType.value)
       }
     }
@@ -65,7 +66,7 @@ export function useSettingsPanel() {
     return {
       initSystemColor,
       initSystemTheme,
-      listenerSystemTheme
+      listenerSystemTheme,
     }
   }
 
@@ -80,7 +81,8 @@ export function useSettingsPanel() {
             settingStore.setMenuOpen(false)
             hasChangedMenu.value = true
           }
-        } else {
+        }
+        else {
           if (hasChangedMenu.value && beforeMenuType.value) {
             useSettingsState().switchMenuLayouts(beforeMenuType.value)
             settingStore.setMenuOpen(true)
@@ -121,7 +123,7 @@ export function useSettingsPanel() {
       handleOpen,
       handleClose,
       openSetting,
-      closeDrawer
+      closeDrawer,
     }
   }
 
@@ -133,7 +135,7 @@ export function useSettingsPanel() {
         if (val !== undefined) {
           showDrawer.value = val
         }
-      }
+      },
     )
   }
 
@@ -166,7 +168,7 @@ export function useSettingsPanel() {
 
     return {
       initializeSettings,
-      cleanupSettings
+      cleanupSettings,
     }
   }
 
@@ -179,6 +181,6 @@ export function useSettingsPanel() {
     useResponsiveLayout,
     useDrawerControl,
     usePropsWatcher,
-    useSettingsInitializer
+    useSettingsInitializer,
   }
 }

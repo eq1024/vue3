@@ -1,3 +1,121 @@
+<script setup lang="ts">
+import { Picture as IconPicture, Search } from '@element-plus/icons-vue'
+
+import { useDateFormat } from '@vueuse/core'
+import { computed, onMounted, ref } from 'vue'
+import { useCommon } from '@/composables/useCommon'
+
+import { ArticleList } from '@/mock/temp/articleList'
+import { router } from '@/router'
+import { RoutesAlias } from '@/router/routesAlias'
+import EmojiText from '@/utils/ui/emojo'
+
+defineOptions({ name: 'ArticleList' })
+
+const yearVal = ref('All')
+
+const options = ['All', '2024', '2023', '2022', '2021', '2020', '2019']
+
+const searchVal = ref('')
+const articleList = ref<any[]>([])
+const currentPage = ref(1)
+const pageSize = ref(40)
+// const lastPage = ref(0)
+const total = ref(0)
+const isLoading = ref(true)
+
+const showEmpty = computed(() => {
+  return articleList.value.length === 0 && !isLoading.value
+})
+
+onMounted(() => {
+  getArticleList({ backTop: false })
+})
+
+// 搜索文章
+function searchArticle() {
+  getArticleList({ backTop: true })
+}
+
+// 根据年份查询文章
+function searchArticleByYear() {
+  getArticleList({ backTop: true })
+}
+
+async function getArticleList({ backTop = false }) {
+  isLoading.value = true
+  // let year = yearVal.value
+
+  if (searchVal.value) {
+    yearVal.value = 'All'
+  }
+
+  if (yearVal.value === 'All') {
+    // year = ''
+  }
+
+  // const params = {
+  //   page: currentPage.value,
+  //   size: pageSize.value,
+  //   searchVal: searchVal.value,
+  //   year
+  // }
+
+  articleList.value = ArticleList
+  isLoading.value = false
+
+  if (backTop) {
+    useCommon().scrollToTop()
+  }
+
+  // const res = await ArticleService.getArticleList(params)
+  // if (res.code === ApiStatus.success) {
+  //   currentPage.value = res.currentPage
+  //   pageSize.value = res.pageSize
+  //   lastPage.value = res.lastPage
+  //   total.value = res.total
+  //   articleList.value = res.data
+
+  //   // setTimeout(() => {
+  //   isLoading.value = false
+  //   // }, 3000)
+
+  //   if (searchVal.value) {
+  //     searchVal.value = ''
+  //   }
+  // }
+}
+
+function handleCurrentChange(val: number) {
+  currentPage.value = val
+  getArticleList({ backTop: true })
+}
+
+function toDetail(item: any) {
+  router.push({
+    path: RoutesAlias.ArticleDetail,
+    query: {
+      id: item.id,
+    },
+  })
+}
+
+function toEdit(item: any) {
+  router.push({
+    path: RoutesAlias.ArticlePublish,
+    query: {
+      id: item.id,
+    },
+  })
+}
+
+function toAddArticle() {
+  router.push({
+    path: RoutesAlias.ArticlePublish,
+  })
+}
+</script>
+
 <template>
   <div class="page-content article-list">
     <ElRow justify="space-between" :gutter="10">
@@ -16,13 +134,15 @@
         </div>
       </ElCol>
       <ElCol :lg="6" :md="6" :sm="10" :xs="6" style="display: flex; justify-content: end">
-        <ElButton @click="toAddArticle" v-auth="'add'">新增文章</ElButton>
+        <ElButton v-auth="'add'" @click="toAddArticle">
+          新增文章
+        </ElButton>
       </ElCol>
     </ElRow>
 
     <div class="list">
       <div class="offset">
-        <div class="item" v-for="item in articleList" :key="item.id" @click="toDetail(item)">
+        <div v-for="item in articleList" :key="item.id" class="item" @click="toDetail(item)">
           <!-- 骨架屏 -->
           <ElSkeleton animated :loading="isLoading" style="width: 100%; height: 100%">
             <template #template>
@@ -43,7 +163,7 @@
                 <ElImage class="cover" :src="item.home_img" lazy fit="cover">
                   <template #error>
                     <div class="image-slot">
-                      <ElIcon><icon-picture /></ElIcon>
+                      <ElIcon><IconPicture /></ElIcon>
                     </div>
                   </template>
                 </ElImage>
@@ -56,11 +176,13 @@
                   <div class="text">
                     <i class="iconfont-sys">&#xe6f7;</i>
                     <span>{{ useDateFormat(item.create_time, 'YYYY-MM-DD') }}</span>
-                    <div class="line"></div>
+                    <div class="line" />
                     <i class="iconfont-sys">&#xe689;</i>
                     <span>{{ item.count }}</span>
                   </div>
-                  <ElButton v-auth="'edit'" size="small" @click.stop="toEdit(item)">编辑</ElButton>
+                  <ElButton v-auth="'edit'" size="small" @click.stop="toEdit(item)">
+                    编辑
+                  </ElButton>
                 </div>
               </div>
             </template>
@@ -69,15 +191,15 @@
       </div>
     </div>
 
-    <div style="margin-top: 16vh" v-if="showEmpty">
+    <div v-if="showEmpty" style="margin-top: 16vh">
       <ElEmpty :description="`未找到相关数据 ${EmojiText[0]}`" />
     </div>
 
     <div style="display: flex; justify-content: center; margin-top: 20px">
       <ElPagination
+        v-model:current-page="currentPage"
         size="default"
         background
-        v-model:current-page="currentPage"
         :page-size="pageSize"
         :pager-count="9"
         layout="prev, pager, next, total,jumper"
@@ -88,124 +210,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { Picture as IconPicture } from '@element-plus/icons-vue'
-
-  import { ref, onMounted, computed } from 'vue'
-  import { router } from '@/router'
-  import { useDateFormat } from '@vueuse/core'
-  import { Search } from '@element-plus/icons-vue'
-  import EmojiText from '@/utils/ui/emojo'
-  import { ArticleList } from '@/mock/temp/articleList'
-  import { useCommon } from '@/composables/useCommon'
-  import { RoutesAlias } from '@/router/routesAlias'
-
-  defineOptions({ name: 'ArticleList' })
-
-  const yearVal = ref('All')
-
-  const options = ['All', '2024', '2023', '2022', '2021', '2020', '2019']
-
-  const searchVal = ref('')
-  const articleList = ref<any[]>([])
-  const currentPage = ref(1)
-  const pageSize = ref(40)
-  // const lastPage = ref(0)
-  const total = ref(0)
-  const isLoading = ref(true)
-
-  const showEmpty = computed(() => {
-    return articleList.value.length === 0 && !isLoading.value
-  })
-
-  onMounted(() => {
-    getArticleList({ backTop: false })
-  })
-
-  // 搜索文章
-  const searchArticle = () => {
-    getArticleList({ backTop: true })
-  }
-
-  // 根据年份查询文章
-  const searchArticleByYear = () => {
-    getArticleList({ backTop: true })
-  }
-
-  const getArticleList = async ({ backTop = false }) => {
-    isLoading.value = true
-    // let year = yearVal.value
-
-    if (searchVal.value) {
-      yearVal.value = 'All'
-    }
-
-    if (yearVal.value === 'All') {
-      // year = ''
-    }
-
-    // const params = {
-    //   page: currentPage.value,
-    //   size: pageSize.value,
-    //   searchVal: searchVal.value,
-    //   year
-    // }
-
-    articleList.value = ArticleList
-    isLoading.value = false
-
-    if (backTop) {
-      useCommon().scrollToTop()
-    }
-
-    // const res = await ArticleService.getArticleList(params)
-    // if (res.code === ApiStatus.success) {
-    //   currentPage.value = res.currentPage
-    //   pageSize.value = res.pageSize
-    //   lastPage.value = res.lastPage
-    //   total.value = res.total
-    //   articleList.value = res.data
-
-    //   // setTimeout(() => {
-    //   isLoading.value = false
-    //   // }, 3000)
-
-    //   if (searchVal.value) {
-    //     searchVal.value = ''
-    //   }
-    // }
-  }
-
-  const handleCurrentChange = (val: number) => {
-    currentPage.value = val
-    getArticleList({ backTop: true })
-  }
-
-  const toDetail = (item: any) => {
-    router.push({
-      path: RoutesAlias.ArticleDetail,
-      query: {
-        id: item.id
-      }
-    })
-  }
-
-  const toEdit = (item: any) => {
-    router.push({
-      path: RoutesAlias.ArticlePublish,
-      query: {
-        id: item.id
-      }
-    })
-  }
-
-  const toAddArticle = () => {
-    router.push({
-      path: RoutesAlias.ArticlePublish
-    })
-  }
-</script>
 
 <style lang="scss" scoped>
   .article-list {

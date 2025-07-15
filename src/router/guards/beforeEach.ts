@@ -1,20 +1,20 @@
-import type { Router, RouteLocationNormalized, NavigationGuardNext } from 'vue-router'
-import { ref, nextTick } from 'vue'
+import type { NavigationGuardNext, RouteLocationNormalized, Router } from 'vue-router'
+import type { AppRouteRecord } from '@/types/router'
 import NProgress from 'nprogress'
+import { nextTick, ref } from 'vue'
+import { menuService } from '@/api/menuApi'
+import { useCommon } from '@/composables/useCommon'
+import { useMenuStore } from '@/store/modules/menu'
 import { useSettingStore } from '@/store/modules/setting'
 import { useUserStore } from '@/store/modules/user'
-import { useMenuStore } from '@/store/modules/menu'
+import { useWorktabStore } from '@/store/modules/worktab'
 import { setWorktab } from '@/utils/navigation'
-import { setPageTitle, setSystemTheme } from '../utils/utils'
-import { menuService } from '@/api/menuApi'
-import { registerDynamicRoutes } from '../utils/registerRoutes'
-import { AppRouteRecord } from '@/types/router'
+import { loadingService } from '@/utils/ui'
+import { asyncRoutes } from '../routes/asyncRoutes'
 import { RoutesAlias } from '../routesAlias'
 import { menuDataToRouter } from '../utils/menuToRouter'
-import { asyncRoutes } from '../routes/asyncRoutes'
-import { loadingService } from '@/utils/ui'
-import { useCommon } from '@/composables/useCommon'
-import { useWorktabStore } from '@/store/modules/worktab'
+import { registerDynamicRoutes } from '../utils/registerRoutes'
+import { setPageTitle, setSystemTheme } from '../utils/utils'
 
 // 前端权限模式 loading 关闭延时，提升用户体验
 const LOADING_DELAY = 300
@@ -33,15 +33,16 @@ export function setupBeforeEachGuard(router: Router): void {
     async (
       to: RouteLocationNormalized,
       from: RouteLocationNormalized,
-      next: NavigationGuardNext
+      next: NavigationGuardNext,
     ) => {
       try {
         await handleRouteGuard(to, from, next, router)
-      } catch (error) {
+      }
+      catch (error) {
         console.error('路由守卫处理失败:', error)
         next('/exception/500')
       }
-    }
+    },
   )
 
   // 设置后置守卫以关闭 loading 和进度条
@@ -76,7 +77,7 @@ async function handleRouteGuard(
   to: RouteLocationNormalized,
   from: RouteLocationNormalized,
   next: NavigationGuardNext,
-  router: Router
+  router: Router,
 ): Promise<void> {
   const settingStore = useSettingStore()
   const userStore = useUserStore()
@@ -129,7 +130,7 @@ async function handleRouteGuard(
 async function handleLoginStatus(
   to: RouteLocationNormalized,
   userStore: ReturnType<typeof useUserStore>,
-  next: NavigationGuardNext
+  next: NavigationGuardNext,
 ): Promise<boolean> {
   if (!userStore.isLogin && to.path !== RoutesAlias.Login && !to.meta.noLogin) {
     userStore.logOut()
@@ -145,7 +146,7 @@ async function handleLoginStatus(
 async function handleDynamicRoutes(
   to: RouteLocationNormalized,
   router: Router,
-  next: NavigationGuardNext
+  next: NavigationGuardNext,
 ): Promise<void> {
   try {
     // 显示 loading 并标记 pending
@@ -163,9 +164,10 @@ async function handleDynamicRoutes(
       path: to.path,
       query: to.query,
       hash: to.hash,
-      replace: true
+      replace: true,
     })
-  } catch (error) {
+  }
+  catch (error) {
     console.error('动态路由注册失败:', error)
     next('/exception/500')
   }
@@ -178,10 +180,12 @@ async function getMenuData(router: Router): Promise<void> {
   try {
     if (useCommon().isFrontendMode.value) {
       await processFrontendMenu(router)
-    } else {
+    }
+    else {
       await processBackendMenu(router)
     }
-  } catch (error) {
+  }
+  catch (error) {
     handleMenuError(error)
     throw error
   }
@@ -191,7 +195,7 @@ async function getMenuData(router: Router): Promise<void> {
  * 处理前端控制模式的菜单逻辑
  */
 async function processFrontendMenu(router: Router): Promise<void> {
-  const menuList = asyncRoutes.map((route) => menuDataToRouter(route))
+  const menuList = asyncRoutes.map(route => menuDataToRouter(route))
   const userStore = useUserStore()
   const roles = userStore.info.roles
 
@@ -202,7 +206,7 @@ async function processFrontendMenu(router: Router): Promise<void> {
   const filteredMenuList = filterMenuByRoles(menuList, roles)
 
   // 添加延时以提升用户体验
-  await new Promise((resolve) => setTimeout(resolve, LOADING_DELAY))
+  await new Promise(resolve => setTimeout(resolve, LOADING_DELAY))
 
   await registerAndStoreMenu(router, filteredMenuList)
 }
@@ -242,10 +246,10 @@ function handleMenuError(error: unknown): void {
 /**
  * 根据角色过滤菜单
  */
-const filterMenuByRoles = (menu: AppRouteRecord[], roles: string[]): AppRouteRecord[] => {
+function filterMenuByRoles(menu: AppRouteRecord[], roles: string[]): AppRouteRecord[] {
   return menu.reduce((acc: AppRouteRecord[], item) => {
     const itemRoles = item.meta?.roles
-    const hasPermission = !itemRoles || itemRoles.some((role) => roles?.includes(role))
+    const hasPermission = !itemRoles || itemRoles.some(role => roles?.includes(role))
 
     if (hasPermission) {
       const filteredItem = { ...item }

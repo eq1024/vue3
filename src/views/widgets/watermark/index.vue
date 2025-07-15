@@ -1,46 +1,67 @@
+<script setup lang="ts">
+import { useSettingStore } from '@/store/modules/setting'
+
+const settingStore = useSettingStore()
+
+// 这里替换成你的实际logo图片地址
+const watermarkImage = ref('https://element-plus.org/images/element-plus-logo.svg')
+
+function handleWatermarkVisible() {
+  useSettingStore().setWatermarkVisible(!settingStore.watermarkVisible)
+}
+</script>
+
 <template>
   <div class="page-content">
     <!-- 基础文字水印 -->
     <ElCard class="card" shadow="never">
-      <template #header>基础文字水印</template>
+      <template #header>
+        基础文字水印
+      </template>
       <ElWatermark content="Art Design Pro" :font="{ color: 'rgba(128, 128, 128, 0.2)' }">
-        <div style="height: 200px"></div>
+        <div style="height: 200px" />
       </ElWatermark>
     </ElCard>
 
     <!-- 多行文字水印 -->
     <ElCard class="card" shadow="never">
-      <template #header>多行文字水印</template>
+      <template #header>
+        多行文字水印
+      </template>
       <ElWatermark
         :content="['Art Design Pro', '专注用户体验，视觉设计']"
         :font="{ fontSize: 16, color: 'rgba(128, 128, 128, 0.2)' }"
       >
-        <div style="height: 200px"></div>
+        <div style="height: 200px" />
       </ElWatermark>
     </ElCard>
 
     <!-- 图片水印 -->
     <ElCard class="card" shadow="never">
-      <template #header>图片水印</template>
+      <template #header>
+        图片水印
+      </template>
       <ElWatermark :image="watermarkImage" :opacity="0.2" :width="80" :height="20">
-        <div style="height: 200px"></div>
+        <div style="height: 200px" />
       </ElWatermark>
     </ElCard>
 
     <!-- 自定义样式水印 -->
     <ElCard class="card" shadow="never">
-      <template #header>自定义样式水印</template>
+      <template #header>
+        自定义样式水印
+      </template>
       <ElWatermark
         content="Art Design Pro"
         :font="{
           fontSize: 20,
           fontFamily: 'Arial',
-          color: 'rgba(255, 0, 0, 0.3)'
+          color: 'rgba(255, 0, 0, 0.3)',
         }"
         :rotate="-22"
         :gap="[100, 100]"
       >
-        <div style="height: 200px"></div>
+        <div style="height: 200px" />
       </ElWatermark>
     </ElCard>
 
@@ -52,19 +73,6 @@
     </ElButton>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useSettingStore } from '@/store/modules/setting'
-
-  const settingStore = useSettingStore()
-
-  // 这里替换成你的实际logo图片地址
-  const watermarkImage = ref('https://element-plus.org/images/element-plus-logo.svg')
-
-  const handleWatermarkVisible = () => {
-    useSettingStore().setWatermarkVisible(!settingStore.watermarkVisible)
-  }
-</script>
 
 <style lang="scss" scoped>
   .page-content {

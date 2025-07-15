@@ -1,8 +1,8 @@
-import { useRoute } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { useUserStore } from '@/store/modules/user'
-import { useCommon } from '@/composables/useCommon'
 import type { AppRouteRecord } from '@/types/router'
+import { storeToRefs } from 'pinia'
+import { useRoute } from 'vue-router'
+import { useCommon } from '@/composables/useCommon'
+import { useUserStore } from '@/store/modules/user'
 
 type AuthItem = NonNullable<AppRouteRecord['meta']['authList']>[number]
 
@@ -14,7 +14,7 @@ const userStore = useUserStore()
  * const { hasAuth } = useAuth()
  * hasAuth('add') // 检查是否拥有新增权限
  */
-export const useAuth = () => {
+export function useAuth() {
   const route = useRoute()
   const { isFrontendMode } = useCommon()
   const { info } = storeToRefs(userStore)
@@ -39,10 +39,10 @@ export const useAuth = () => {
     }
 
     // 后端模式
-    return backendAuthList.some((item) => item?.authMark === auth)
+    return backendAuthList.some(item => item?.authMark === auth)
   }
 
   return {
-    hasAuth
+    hasAuth,
   }
 }

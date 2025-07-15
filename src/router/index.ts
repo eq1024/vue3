@@ -1,15 +1,15 @@
 import type { App } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { setupAfterEachGuard } from './guards/afterEach'
+import { setupBeforeEachGuard } from './guards/beforeEach'
 import { staticRoutes } from './routes/staticRoutes'
 import { configureNProgress } from './utils/utils'
-import { setupBeforeEachGuard } from './guards/beforeEach'
-import { setupAfterEachGuard } from './guards/afterEach'
 
 // 创建路由实例
 export const router = createRouter({
   history: createWebHashHistory(),
   routes: staticRoutes, // 静态路由
-  scrollBehavior: () => ({ left: 0, top: 0 }) // 滚动行为
+  scrollBehavior: () => ({ left: 0, top: 0 }), // 滚动行为
 })
 
 // 初始化路由

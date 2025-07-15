@@ -1,35 +1,43 @@
+<script setup lang="ts">
+const list = [
+  { name: '总用户量', num: '32k' },
+  { name: '总访问量', num: '128k' },
+  { name: '日访问量', num: '1.2k' },
+  { name: '周同比', num: '+5%' },
+]
+</script>
+
 <template>
   <div class="card art-custom-card">
     <ArtBarChart
       class="chart"
-      barWidth="50%"
+      bar-width="50%"
       height="13.7rem"
-      :showAxisLine="false"
+      :show-axis-line="false"
       :data="[160, 100, 150, 80, 190, 100, 175, 120, 160]"
-      :xAxisData="['1', '2', '3', '4', '5', '6', '7', '8', '9']"
+      :x-axis-data="['1', '2', '3', '4', '5', '6', '7', '8', '9']"
     />
     <div class="text">
-      <h3 class="box-title">用户概述</h3>
-      <p class="subtitle">比上周 <span class="text-success">+23%</span></p>
-      <p class="subtitle">我们为您创建了多个选项，可将它们组合在一起并定制为像素完美的页面</p>
+      <h3 class="box-title">
+        用户概述
+      </h3>
+      <p class="subtitle">
+        比上周 <span class="text-success">+23%</span>
+      </p>
+      <p class="subtitle">
+        我们为您创建了多个选项，可将它们组合在一起并定制为像素完美的页面
+      </p>
     </div>
     <div class="list">
       <div v-for="(item, index) in list" :key="index">
         <p>{{ item.num }}</p>
-        <p class="subtitle">{{ item.name }}</p>
+        <p class="subtitle">
+          {{ item.name }}
+        </p>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  const list = [
-    { name: '总用户量', num: '32k' },
-    { name: '总访问量', num: '128k' },
-    { name: '日访问量', num: '1.2k' },
-    { name: '周同比', num: '+5%' }
-  ]
-</script>
 
 <style lang="scss" scoped>
   .card {

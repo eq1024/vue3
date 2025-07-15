@@ -1,7 +1,24 @@
 <!-- 返回顶部 -->
+<script setup lang="ts">
+import { useCommon } from '@/composables/useCommon'
+
+defineOptions({ name: 'ArtBackToTop' })
+
+const { scrollToTop } = useCommon()
+
+const { y } = useWindowScroll()
+const showButton = ref(false)
+const scrollThreshold = 2000 // 设置阈值
+
+// 监听滚动位置
+watch(y, (newY: number) => {
+  showButton.value = newY > scrollThreshold
+})
+</script>
+
 <template>
   <div>
-    <div class="back-to-top" v-show="showButton" @click="scrollToTop">
+    <div v-show="showButton" class="back-to-top" @click="scrollToTop">
       <div class="back-to-top-btn">
         <i class="iconfont-sys">&#xe864;</i>
         <p>顶部</p>
@@ -9,23 +26,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useCommon } from '@/composables/useCommon'
-
-  defineOptions({ name: 'ArtBackToTop' })
-
-  const { scrollToTop } = useCommon()
-
-  const { y } = useWindowScroll()
-  const showButton = ref(false)
-  const scrollThreshold = 2000 // 设置阈值
-
-  // 监听滚动位置
-  watch(y, (newY: number) => {
-    showButton.value = newY > scrollThreshold
-  })
-</script>
 
 <style lang="scss" scoped>
   .back-to-top {

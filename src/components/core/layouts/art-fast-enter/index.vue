@@ -1,4 +1,28 @@
 <!-- 顶部快速入口面板 -->
+<script setup lang="ts">
+import { useFastEnter } from '@/composables/useFastEnter'
+
+defineOptions({ name: 'ArtFastEnter' })
+
+const router = useRouter()
+const popoverRef = ref()
+
+// 使用快速入口配置
+const { enabledApplications, enabledQuickLinks } = useFastEnter()
+
+const isExternalLink = (path: string): boolean => path.startsWith('http')
+
+function handleNavigate(path: string): void {
+  if (isExternalLink(path)) {
+    window.open(path, '_blank')
+  }
+  else {
+    router.push(path)
+  }
+  popoverRef.value?.hide()
+}
+</script>
+
 <template>
   <ElPopover
     ref="popoverRef"
@@ -10,14 +34,14 @@
     :offset="0"
     :popper-style="{
       border: '1px solid var(--art-border-dashed-color)',
-      borderRadius: 'calc(var(--custom-radius) / 2 + 4px)'
+      borderRadius: 'calc(var(--custom-radius) / 2 + 4px)',
     }"
   >
     <template #reference>
       <div class="fast-enter-trigger">
         <div class="btn">
           <i class="iconfont-sys">&#xe81a;</i>
-          <span class="red-dot"></span>
+          <span class="red-dot" />
         </div>
       </div>
     </template>
@@ -35,8 +59,8 @@
             <div class="app-icon">
               <i
                 class="iconfont-sys"
-                v-html="application.icon"
                 :style="{ color: application.iconColor }"
+                v-html="application.icon"
               />
             </div>
             <div class="app-info">
@@ -62,29 +86,6 @@
     </div>
   </ElPopover>
 </template>
-
-<script setup lang="ts">
-  import { useFastEnter } from '@/composables/useFastEnter'
-
-  defineOptions({ name: 'ArtFastEnter' })
-
-  const router = useRouter()
-  const popoverRef = ref()
-
-  // 使用快速入口配置
-  const { enabledApplications, enabledQuickLinks } = useFastEnter()
-
-  const isExternalLink = (path: string): boolean => path.startsWith('http')
-
-  const handleNavigate = (path: string): void => {
-    if (isExternalLink(path)) {
-      window.open(path, '_blank')
-    } else {
-      router.push(path)
-    }
-    popoverRef.value?.hide()
-  }
-</script>
 
 <style lang="scss" scoped>
   @use './style';

@@ -1,6 +1,14 @@
+<script setup lang="ts">
+import { upgradeLogList } from '@/mock/upgrade/changeLog'
+
+defineOptions({ name: 'ChangeLog' })
+</script>
+
 <template>
   <div class="page-content">
-    <h3 class="table-title"><i class="iconfont-sys">&#xe74d;</i>更新日志</h3>
+    <h3 class="table-title">
+      <i class="iconfont-sys">&#xe74d;</i>更新日志
+    </h3>
 
     <!-- 桌面端表格显示 -->
     <div class="desktop-view">
@@ -8,9 +16,11 @@
         <ElTableColumn label="版本号" prop="version" width="100" />
         <ElTableColumn label="内容">
           <template #default="scope">
-            <div class="title">{{ scope.row.title }}</div>
+            <div class="title">
+              {{ scope.row.title }}
+            </div>
             <div v-if="scope.row.detail" style="margin-top: 10px">
-              <div class="detail-item" v-for="(item, index) in scope.row.detail" :key="index">
+              <div v-for="(item, index) in scope.row.detail" :key="index" class="detail-item">
                 {{ index + 1 }}. {{ item }}
               </div>
             </div>
@@ -26,12 +36,18 @@
       <div class="changelog-cards">
         <div v-for="item in upgradeLogList" :key="item.version" class="changelog-card">
           <div class="card-header">
-            <div class="version-tag">{{ item.version }}</div>
-            <div class="date">{{ item.date }}</div>
+            <div class="version-tag">
+              {{ item.version }}
+            </div>
+            <div class="date">
+              {{ item.date }}
+            </div>
           </div>
 
           <div class="card-content">
-            <h4 class="title">{{ item.title }}</h4>
+            <h4 class="title">
+              {{ item.title }}
+            </h4>
 
             <div v-if="item.detail && item.detail.length > 0" class="details">
               <div class="detail-list">
@@ -47,7 +63,9 @@
             </div>
 
             <div v-if="item.requireReLogin" class="require-relogin">
-              <ElTag type="warning" size="small"> 需要重新登录 </ElTag>
+              <ElTag type="warning" size="small">
+                需要重新登录
+              </ElTag>
             </div>
           </div>
         </div>
@@ -55,12 +73,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { upgradeLogList } from '@/mock/upgrade/changeLog'
-
-  defineOptions({ name: 'ChangeLog' })
-</script>
 
 <style lang="scss" scoped>
   .page-content {

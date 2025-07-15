@@ -5,44 +5,44 @@ export enum MenuTypeEnum {
   LEFT = 'left',
   TOP = 'top',
   TOP_LEFT = 'top-left',
-  DUAL_MENU = 'dual-menu'
+  DUAL_MENU = 'dual-menu',
 }
 
 // App theme enum
 export enum SystemThemeEnum {
   DARK = 'dark',
   LIGHT = 'light',
-  AUTO = 'auto'
+  AUTO = 'auto',
 }
 
 // Menu theme enum
 export enum MenuThemeEnum {
   DARK = 'dark',
   LIGHT = 'light',
-  DESIGN = 'design'
+  DESIGN = 'design',
 }
 
 // Menu close width
 export enum MenuWidth {
-  CLOSE = '70px'
+  CLOSE = '70px',
 }
 
 // Language
 export enum LanguageEnum {
   ZH = 'zh',
-  EN = 'en'
+  EN = 'en',
 }
 
 // Icon type
 export enum IconTypeEnum {
   CLASS_NAME = 'className',
-  UNICODE = 'unicode'
+  UNICODE = 'unicode',
 }
 
 // Container width
 export enum ContainerWidthEnum {
   FULL = '100%',
-  BOXED = '1200px'
+  BOXED = '1200px',
 }
 
 // Background color enum
@@ -53,5 +53,5 @@ export enum BgColorEnum {
   ERROR = 'bg-error',
   SUCCESS = 'bg-success',
   DANGER = 'bg-danger',
-  INFO = 'bg-info'
+  INFO = 'bg-info',
 }

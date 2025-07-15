@@ -1,21 +1,25 @@
 <template>
   <div class="card art-custom-card sales-card" style="height: 26rem">
     <div class="card-header">
-      <p class="title">销售分类</p>
-      <p class="subtitle">按产品类别</p>
+      <p class="title">
+        销售分类
+      </p>
+      <p class="subtitle">
+        按产品类别
+      </p>
     </div>
     <ArtRingChart
       :data="[
         { value: 30, name: '电子产品' },
         { value: 55, name: '服装鞋包' },
-        { value: 36, name: '家居用品' }
+        { value: 36, name: '家居用品' },
       ]"
       :color="['#4C87F3', '#EDF2FF', '#8BD8FC']"
       :radius="['70%', '80%']"
       height="16.5rem"
-      :showLabel="false"
-      :borderRadius="0"
-      centerText="¥300,458"
+      :show-label="false"
+      :border-radius="0"
+      center-text="¥300,458"
     />
     <div class="icon-text-widget">
       <div class="item">

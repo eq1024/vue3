@@ -1,3 +1,15 @@
+<script setup lang="ts">
+const weekDays = ref(['周一', '周二', '周三', '周四', '周五', '周六', '周日'])
+
+const revenueData = ref([
+  {
+    name: '线上销售',
+    data: [12, 13, 5, 15, 10, 15, 18],
+    // color: '#6E93FF'
+  },
+])
+</script>
+
 <template>
   <div class="custom-card art-custom-card target-vs-reality">
     <div class="custom-card-header">
@@ -7,9 +19,9 @@
       <ArtBarChart
         height="10rem"
         :data="revenueData"
-        :xAxisData="weekDays"
-        :showAxisLine="false"
-        barWidth="28%"
+        :x-axis-data="weekDays"
+        :show-axis-line="false"
+        bar-width="28%"
       />
     </div>
     <div class="custom-card-footer">
@@ -21,7 +33,9 @@
             <span>全球</span>
           </div>
         </div>
-        <div class="value text-color-green">8,823</div>
+        <div class="value text-color-green">
+          8,823
+        </div>
       </div>
       <div class="total-item">
         <div class="label">
@@ -31,23 +45,13 @@
             <span>商业</span>
           </div>
         </div>
-        <div class="value text-color-orange">12,122</div>
+        <div class="value text-color-orange">
+          12,122
+        </div>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  const weekDays = ref(['周一', '周二', '周三', '周四', '周五', '周六', '周日'])
-
-  const revenueData = ref([
-    {
-      name: '线上销售',
-      data: [12, 13, 5, 15, 10, 15, 18]
-      // color: '#6E93FF'
-    }
-  ])
-</script>
 
 <style lang="scss" scoped>
   .custom-card {

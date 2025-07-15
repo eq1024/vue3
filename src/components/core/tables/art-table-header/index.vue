@@ -1,8 +1,164 @@
 <!-- 表格头部，包含表格大小、刷新、全屏、列设置、其他设置 -->
+<script lang="ts" setup>
+import type { ColumnOption } from '@/types/component'
+import { ElCheckbox, ElDropdown, ElDropdownItem, ElDropdownMenu, ElPopover } from 'element-plus'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { VueDraggable } from 'vue-draggable-plus'
+import { useI18n } from 'vue-i18n'
+import { TableSizeEnum } from '@/enums/formEnum'
+import { useTableStore } from '@/store/modules/table'
+
+defineOptions({ name: 'ArtTableHeader' })
+
+const props = withDefaults(defineProps<Props>(), {
+  showZebra: true,
+  showBorder: true,
+  showHeaderBackground: true,
+  fullClass: 'art-page-view',
+  layout: 'refresh,size,fullscreen,columns,settings',
+})
+
+const emit = defineEmits<{
+  (e: 'refresh'): void
+}>()
+
+const { t } = useI18n()
+
+interface Props {
+  /** 斑马纹 */
+  showZebra?: boolean
+  /** 边框 */
+  showBorder?: boolean
+  /** 表头背景 */
+  showHeaderBackground?: boolean
+  /** 全屏 class */
+  fullClass?: string
+  /** 组件布局，子组件名用逗号分隔 */
+  layout?: string
+}
+
+const columns = defineModel<ColumnOption[]>('columns', {
+  required: false,
+  default: () => [],
+})
+
+// ========== 数据和状态 ==========
+
+/** 表格大小选项配置 */
+const tableSizeOptions = [
+  { value: TableSizeEnum.SMALL, label: t('table.sizeOptions.small') },
+  { value: TableSizeEnum.DEFAULT, label: t('table.sizeOptions.default') },
+  { value: TableSizeEnum.LARGE, label: t('table.sizeOptions.large') },
+]
+
+const tableStore = useTableStore()
+const { tableSize, isZebra, isBorder, isHeaderBackground } = storeToRefs(tableStore)
+
+// ========== 计算属性 ==========
+
+/** 解析 layout 属性，转换为数组 */
+const layoutItems = computed(() => {
+  return props.layout.split(',').map(item => item.trim())
+})
+
+// ========== 工具方法 ==========
+
+/**
+ * 检查组件是否应该显示
+ * @param componentName 组件名称
+ * @returns 是否显示
+ */
+function shouldShow(componentName: string) {
+  return layoutItems.value.includes(componentName)
+}
+
+// ========== 事件处理 ==========
+
+/** 刷新事件处理 */
+function refresh() {
+  emit('refresh')
+}
+
+/**
+ * 表格大小变化处理
+ * @param command 表格大小枚举值
+ */
+function handleTableSizeChange(command: TableSizeEnum) {
+  useTableStore().setTableSize(command)
+}
+
+// ========== 全屏功能 ==========
+
+/** 是否全屏状态 */
+const isFullScreen = ref(false)
+
+/** 保存原始的 overflow 样式，用于退出全屏时恢复 */
+const originalOverflow = ref('')
+
+/**
+ * 切换全屏状态
+ * 进入全屏时会隐藏页面滚动条，退出时恢复原状态
+ */
+function toggleFullScreen() {
+  const el = document.querySelector(`.${props.fullClass}`)
+  if (!el)
+    return
+
+  isFullScreen.value = !isFullScreen.value
+
+  if (isFullScreen.value) {
+    // 进入全屏：保存原始样式并隐藏滚动条
+    originalOverflow.value = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    el.classList.add('el-full-screen')
+    tableStore.setIsFullScreen(true)
+  }
+  else {
+    // 退出全屏：恢复原始样式
+    document.body.style.overflow = originalOverflow.value
+    el.classList.remove('el-full-screen')
+    tableStore.setIsFullScreen(false)
+  }
+}
+
+/**
+ * ESC键退出全屏的事件处理器
+ * 需要保存引用以便在组件卸载时正确移除监听器
+ */
+function handleEscapeKey(e: KeyboardEvent) {
+  if (e.key === 'Escape' && isFullScreen.value) {
+    toggleFullScreen()
+  }
+}
+
+// ========== 生命周期钩子 ==========
+
+/** 组件挂载时注册全局事件监听器 */
+onMounted(() => {
+  document.addEventListener('keydown', handleEscapeKey)
+})
+
+/** 组件卸载时清理资源 */
+onUnmounted(() => {
+  // 移除事件监听器
+  document.removeEventListener('keydown', handleEscapeKey)
+
+  // 如果组件在全屏状态下被卸载，恢复页面滚动状态
+  if (isFullScreen.value) {
+    document.body.style.overflow = originalOverflow.value
+    const el = document.querySelector(`.${props.fullClass}`)
+    if (el) {
+      el.classList.remove('el-full-screen')
+    }
+  }
+})
+</script>
+
 <template>
   <div class="table-header">
     <div class="left">
-      <slot name="left"></slot>
+      <slot name="left" />
     </div>
     <div class="right">
       <div v-if="shouldShow('refresh')" class="btn" @click="refresh">
@@ -35,7 +191,9 @@
       <!-- 列设置 -->
       <ElPopover v-if="shouldShow('columns')" placement="bottom" trigger="click">
         <template #reference>
-          <div class="btn"><i class="iconfont-sys">&#xe6bd;</i> </div>
+          <div class="btn">
+            <i class="iconfont-sys">&#xe6bd;</i>
+          </div>
         </template>
         <div>
           <VueDraggable v-model="columns">
@@ -43,9 +201,11 @@
               <div class="drag-icon">
                 <i class="iconfont-sys">&#xe648;</i>
               </div>
-              <ElCheckbox v-model="item.checked" :disabled="item.disabled">{{
-                item.label || (item.type === 'selection' ? t('table.selection') : '')
-              }}</ElCheckbox>
+              <ElCheckbox v-model="item.checked" :disabled="item.disabled">
+                {{
+                  item.label || (item.type === 'selection' ? t('table.selection') : '')
+                }}
+              </ElCheckbox>
             </div>
           </VueDraggable>
         </div>
@@ -58,175 +218,27 @@
           </div>
         </template>
         <div>
-          <ElCheckbox v-if="showZebra" v-model="isZebra" :value="true">{{
-            t('table.zebra')
-          }}</ElCheckbox>
-          <ElCheckbox v-if="showBorder" v-model="isBorder" :value="true">{{
-            t('table.border')
-          }}</ElCheckbox>
-          <ElCheckbox v-if="showHeaderBackground" v-model="isHeaderBackground" :value="true">{{
-            t('table.headerBackground')
-          }}</ElCheckbox>
+          <ElCheckbox v-if="showZebra" v-model="isZebra" :value="true">
+            {{
+              t('table.zebra')
+            }}
+          </ElCheckbox>
+          <ElCheckbox v-if="showBorder" v-model="isBorder" :value="true">
+            {{
+              t('table.border')
+            }}
+          </ElCheckbox>
+          <ElCheckbox v-if="showHeaderBackground" v-model="isHeaderBackground" :value="true">
+            {{
+              t('table.headerBackground')
+            }}
+          </ElCheckbox>
         </div>
       </ElPopover>
-      <slot name="right"></slot>
+      <slot name="right" />
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { computed, ref, onMounted, onUnmounted } from 'vue'
-  import { storeToRefs } from 'pinia'
-  import { TableSizeEnum } from '@/enums/formEnum'
-  import { useTableStore } from '@/store/modules/table'
-  import { ElPopover, ElCheckbox, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
-  import { VueDraggable } from 'vue-draggable-plus'
-  import { useI18n } from 'vue-i18n'
-  import type { ColumnOption } from '@/types/component'
-
-  defineOptions({ name: 'ArtTableHeader' })
-
-  const { t } = useI18n()
-
-  interface Props {
-    /** 斑马纹 */
-    showZebra?: boolean
-    /** 边框 */
-    showBorder?: boolean
-    /** 表头背景 */
-    showHeaderBackground?: boolean
-    /** 全屏 class */
-    fullClass?: string
-    /** 组件布局，子组件名用逗号分隔 */
-    layout?: string
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    showZebra: true,
-    showBorder: true,
-    showHeaderBackground: true,
-    fullClass: 'art-page-view',
-    layout: 'refresh,size,fullscreen,columns,settings'
-  })
-
-  const columns = defineModel<ColumnOption[]>('columns', {
-    required: false,
-    default: () => []
-  })
-
-  const emit = defineEmits<{
-    (e: 'refresh'): void
-  }>()
-
-  // ========== 数据和状态 ==========
-
-  /** 表格大小选项配置 */
-  const tableSizeOptions = [
-    { value: TableSizeEnum.SMALL, label: t('table.sizeOptions.small') },
-    { value: TableSizeEnum.DEFAULT, label: t('table.sizeOptions.default') },
-    { value: TableSizeEnum.LARGE, label: t('table.sizeOptions.large') }
-  ]
-
-  const tableStore = useTableStore()
-  const { tableSize, isZebra, isBorder, isHeaderBackground } = storeToRefs(tableStore)
-
-  // ========== 计算属性 ==========
-
-  /** 解析 layout 属性，转换为数组 */
-  const layoutItems = computed(() => {
-    return props.layout.split(',').map((item) => item.trim())
-  })
-
-  // ========== 工具方法 ==========
-
-  /**
-   * 检查组件是否应该显示
-   * @param componentName 组件名称
-   * @returns 是否显示
-   */
-  const shouldShow = (componentName: string) => {
-    return layoutItems.value.includes(componentName)
-  }
-
-  // ========== 事件处理 ==========
-
-  /** 刷新事件处理 */
-  const refresh = () => {
-    emit('refresh')
-  }
-
-  /**
-   * 表格大小变化处理
-   * @param command 表格大小枚举值
-   */
-  const handleTableSizeChange = (command: TableSizeEnum) => {
-    useTableStore().setTableSize(command)
-  }
-
-  // ========== 全屏功能 ==========
-
-  /** 是否全屏状态 */
-  const isFullScreen = ref(false)
-
-  /** 保存原始的 overflow 样式，用于退出全屏时恢复 */
-  const originalOverflow = ref('')
-
-  /**
-   * 切换全屏状态
-   * 进入全屏时会隐藏页面滚动条，退出时恢复原状态
-   */
-  const toggleFullScreen = () => {
-    const el = document.querySelector(`.${props.fullClass}`)
-    if (!el) return
-
-    isFullScreen.value = !isFullScreen.value
-
-    if (isFullScreen.value) {
-      // 进入全屏：保存原始样式并隐藏滚动条
-      originalOverflow.value = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
-      el.classList.add('el-full-screen')
-      tableStore.setIsFullScreen(true)
-    } else {
-      // 退出全屏：恢复原始样式
-      document.body.style.overflow = originalOverflow.value
-      el.classList.remove('el-full-screen')
-      tableStore.setIsFullScreen(false)
-    }
-  }
-
-  /**
-   * ESC键退出全屏的事件处理器
-   * 需要保存引用以便在组件卸载时正确移除监听器
-   */
-  const handleEscapeKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && isFullScreen.value) {
-      toggleFullScreen()
-    }
-  }
-
-  // ========== 生命周期钩子 ==========
-
-  /** 组件挂载时注册全局事件监听器 */
-  onMounted(() => {
-    document.addEventListener('keydown', handleEscapeKey)
-  })
-
-  /** 组件卸载时清理资源 */
-  onUnmounted(() => {
-    // 移除事件监听器
-    document.removeEventListener('keydown', handleEscapeKey)
-
-    // 如果组件在全屏状态下被卸载，恢复页面滚动状态
-    if (isFullScreen.value) {
-      document.body.style.overflow = originalOverflow.value
-      const el = document.querySelector(`.${props.fullClass}`)
-      if (el) {
-        el.classList.remove('el-full-screen')
-      }
-    }
-  })
-</script>
 
 <style lang="scss" scoped>
   :deep(.table-size-btn-item) {

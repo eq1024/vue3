@@ -1,3 +1,36 @@
+<script setup lang="ts">
+const salesData = ref([
+  {
+    label: '总销售额',
+    value: 999,
+    change: '+10%',
+    iconfont: '&#xe7d9',
+    class: 'bg-primary',
+  },
+  {
+    label: '总订单量',
+    value: 300,
+    change: '+15%',
+    iconfont: '&#xe70f',
+    class: 'bg-warning',
+  },
+  {
+    label: '产品销售量',
+    value: 56,
+    change: '-5%',
+    iconfont: '&#xe712',
+    class: 'bg-error',
+  },
+  {
+    label: '新客户数',
+    value: 68,
+    change: '+8%',
+    iconfont: '&#xe77f',
+    class: 'bg-success',
+  },
+])
+</script>
+
 <template>
   <div class="custom-card art-custom-card today-sales">
     <div class="custom-card-header">
@@ -10,16 +43,16 @@
     </div>
     <div class="sales-summary">
       <el-row :gutter="20">
-        <el-col :span="6" :xs="24" v-for="(item, index) in salesData" :key="index">
-          <div :class="['sales-card']">
-            <i class="iconfont-sys" v-html="item.iconfont"></i>
+        <el-col v-for="(item, index) in salesData" :key="index" :span="6" :xs="24">
+          <div class="sales-card">
+            <i class="iconfont-sys" v-html="item.iconfont" />
             <h2>
               <ArtCountTo class="number box-title" :target="item.value" :duration="1500" />
             </h2>
             <p>{{ item.label }}</p>
             <small>
               较昨天
-              <span :class="[item.change.indexOf('+') === -1 ? 'text-danger' : 'text-success']">{{
+              <span :class="[!item.change.includes('+') ? 'text-danger' : 'text-success']">{{
                 item.change
               }}</span>
             </small>
@@ -29,39 +62,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  const salesData = ref([
-    {
-      label: '总销售额',
-      value: 999,
-      change: '+10%',
-      iconfont: '&#xe7d9',
-      class: 'bg-primary'
-    },
-    {
-      label: '总订单量',
-      value: 300,
-      change: '+15%',
-      iconfont: '&#xe70f',
-      class: 'bg-warning'
-    },
-    {
-      label: '产品销售量',
-      value: 56,
-      change: '-5%',
-      iconfont: '&#xe712',
-      class: 'bg-error'
-    },
-    {
-      label: '新客户数',
-      value: 68,
-      change: '+8%',
-      iconfont: '&#xe77f',
-      class: 'bg-success'
-    }
-  ])
-</script>
 
 <style lang="scss" scoped>
   .today-sales {

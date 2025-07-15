@@ -1,3 +1,199 @@
+<script setup lang="ts">
+import { Plus } from '@element-plus/icons-vue'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
+import { useCommon } from '@/composables/useCommon'
+import { PageModeEnum } from '@/enums/formEnum'
+import { useUserStore } from '@/store/modules/user'
+import { ApiStatus } from '@/utils/http/status'
+import EmojiText from '@/utils/ui/emojo'
+
+defineOptions({ name: 'ArticlePublish' })
+
+const route = useRoute()
+
+const userStore = useUserStore()
+const { accessToken } = userStore
+
+// 上传路径
+const uploadImageUrl = `${import.meta.env.VITE_API_URL}/api/common/upload`
+// 传递 token
+const uploadHeaders = { Authorization: accessToken }
+
+let pageMode: PageModeEnum = PageModeEnum.Add // 页面类型 新增 ｜ 编辑
+const articleName = ref('') // 文章标题
+const articleType = ref() // 文章类型
+const articleTypes = ref() // 类型列表
+const editorHtml = ref('') // 编辑器内容
+const createDate = ref('') // 创建时间
+const cover = ref('') // 图片
+const visible = ref(true) // 可见
+// const outlineList = ref()
+
+onMounted(() => {
+  useCommon().scrollToTop()
+  getArticleTypes()
+  initPageMode()
+})
+
+// 初始化页面类型 新增 ｜ 编辑
+function initPageMode() {
+  const { id } = route.query
+  pageMode = id ? PageModeEnum.Edit : PageModeEnum.Add
+  if (pageMode === PageModeEnum.Edit && id) {
+    initEditArticle()
+  }
+  else {
+    initAddArticle()
+  }
+}
+
+// 初始化编辑文章的逻辑
+function initEditArticle() {
+  getArticleDetail()
+}
+
+// 初始化新增文章逻辑
+function initAddArticle() {
+  createDate.value = formDate(useNow().value)
+}
+
+// 获取文章类型
+async function getArticleTypes() {
+  try {
+    const response = await axios.get('https://www.qiniu.lingchen.kim/classify.json')
+    if (response.data.code === 200) {
+      articleTypes.value = response.data.data
+    }
+  }
+  catch (error) {
+    console.error('Error fetching JSON data:', error)
+  }
+  // try {
+  //   const res = await ArticleService.getArticleTypes({})
+  //   if (res.code === ApiStatus.success) {
+  //     articleTypes.value = res.data
+  //   }
+  // } catch (err) { }
+}
+
+async function getArticleDetail() {
+  const res = await axios.get('https://www.qiniu.lingchen.kim/blog_list.json')
+
+  if (res.data.code === ApiStatus.success) {
+    const { title, blog_class, html_content } = res.data.data
+    articleName.value = title
+    articleType.value = Number(blog_class)
+    editorHtml.value = html_content
+  }
+}
+
+// const getOutline = (content: string) => {
+//   const regex = /<h([1-3])>(.*?)<\/h\1>/g
+//   const headings = []
+//   let match
+
+//   while ((match = regex.exec(content)) !== null) {
+//     headings.push({ level: match[1], text: match[2] })
+//   }
+//   outlineList.value = headings
+// }
+
+// 提交
+function submit() {
+  if (pageMode === PageModeEnum.Edit) {
+    editArticle()
+  }
+  else {
+    addArticle()
+  }
+}
+
+// 格式化日期
+function formDate(date: string | Date): string {
+  return useDateFormat(date, 'YYYY-MM-DD').value
+}
+
+// 验证输入
+function validateArticle() {
+  if (!articleName.value) {
+    ElMessage.error(`请输入文章标题`)
+    return false
+  }
+
+  if (!articleType.value) {
+    ElMessage.error(`请选择文章类型`)
+    return false
+  }
+
+  if (editorHtml.value === '<p><br></p>') {
+    ElMessage.error(`请输入文章内容`)
+    return false
+  }
+
+  if (!cover.value) {
+    ElMessage.error(`请上传图片`)
+    return false
+  }
+
+  return true
+}
+
+// 添加文章
+async function addArticle() {
+  try {
+    if (!validateArticle())
+      return
+    editorHtml.value = delCodeTrim(editorHtml.value)
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
+// 编辑文章
+async function editArticle() {
+  try {
+    if (!validateArticle())
+      return
+
+    editorHtml.value = delCodeTrim(editorHtml.value)
+  }
+  catch (err) {
+    console.error(err)
+  }
+}
+
+function delCodeTrim(content: string): string {
+  return content.replace(/(\s*)<\/code>/g, '</code>')
+}
+
+function onSuccess(response: any) {
+  cover.value = response.data.url
+  ElMessage.success(`图片上传成功 ${EmojiText[200]}`)
+}
+
+function onError() {
+  ElMessage.error(`图片上传失败 ${EmojiText[500]}`)
+}
+
+// 添加上传前的校验
+function beforeUpload(file: File) {
+  const isImage = file.type.startsWith('image/')
+  const isLt2M = file.size / 1024 / 1024 < 2
+
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件!')
+    return false
+  }
+  if (!isLt2M) {
+    ElMessage.error('图片大小不能超过 2MB!')
+    return false
+  }
+  return true
+}
+</script>
+
 <template>
   <div class="article-edit">
     <div>
@@ -24,7 +220,7 @@
         </ElRow>
 
         <!-- 富文本编辑器 -->
-        <ArtWangEditor class="el-top" v-model="editorHtml" />
+        <ArtWangEditor v-model="editorHtml" class="el-top" />
 
         <div class="form-wrap">
           <h2>发布设置</h2>
@@ -42,12 +238,18 @@
                   :before-upload="beforeUpload"
                 >
                   <div v-if="!cover" class="upload-placeholder">
-                    <ElIcon class="upload-icon"><Plus /></ElIcon>
-                    <div class="upload-text">点击上传封面</div>
+                    <ElIcon class="upload-icon">
+                      <Plus />
+                    </ElIcon>
+                    <div class="upload-text">
+                      点击上传封面
+                    </div>
                   </div>
-                  <img v-else :src="cover" class="cover-image" />
+                  <img v-else :src="cover" class="cover-image">
                 </ElUpload>
-                <div class="el-upload__tip">建议尺寸 16:9，jpg/png 格式</div>
+                <div class="el-upload__tip">
+                  建议尺寸 16:9，jpg/png 格式
+                </div>
               </div>
             </ElFormItem>
             <ElFormItem label="可见">
@@ -56,7 +258,7 @@
           </ElForm>
 
           <div style="display: flex; justify-content: flex-end">
-            <ElButton type="primary" @click="submit" style="width: 100px">
+            <ElButton type="primary" style="width: 100px" @click="submit">
               {{ pageMode === PageModeEnum.Edit ? '保存' : '发布' }}
             </ElButton>
           </div>
@@ -71,195 +273,6 @@
       </div> -->
   </div>
 </template>
-
-<script setup lang="ts">
-  import { Plus } from '@element-plus/icons-vue'
-  import { ApiStatus } from '@/utils/http/status'
-  import { ElMessage } from 'element-plus'
-  import { useUserStore } from '@/store/modules/user'
-  import EmojiText from '@/utils/ui/emojo'
-  import { PageModeEnum } from '@/enums/formEnum'
-  import axios from 'axios'
-  import { useCommon } from '@/composables/useCommon'
-
-  defineOptions({ name: 'ArticlePublish' })
-
-  const route = useRoute()
-
-  const userStore = useUserStore()
-  let { accessToken } = userStore
-
-  // 上传路径
-  const uploadImageUrl = `${import.meta.env.VITE_API_URL}/api/common/upload`
-  // 传递 token
-  const uploadHeaders = { Authorization: accessToken }
-
-  let pageMode: PageModeEnum = PageModeEnum.Add // 页面类型 新增 ｜ 编辑
-  const articleName = ref('') // 文章标题
-  const articleType = ref() // 文章类型
-  const articleTypes = ref() // 类型列表
-  const editorHtml = ref('') // 编辑器内容
-  const createDate = ref('') // 创建时间
-  const cover = ref('') // 图片
-  const visible = ref(true) // 可见
-  // const outlineList = ref()
-
-  onMounted(() => {
-    useCommon().scrollToTop()
-    getArticleTypes()
-    initPageMode()
-  })
-
-  // 初始化页面类型 新增 ｜ 编辑
-  const initPageMode = () => {
-    const { id } = route.query
-    pageMode = id ? PageModeEnum.Edit : PageModeEnum.Add
-    if (pageMode === PageModeEnum.Edit && id) {
-      initEditArticle()
-    } else {
-      initAddArticle()
-    }
-  }
-
-  // 初始化编辑文章的逻辑
-  const initEditArticle = () => {
-    getArticleDetail()
-  }
-
-  // 初始化新增文章逻辑
-  const initAddArticle = () => {
-    createDate.value = formDate(useNow().value)
-  }
-
-  // 获取文章类型
-  const getArticleTypes = async () => {
-    try {
-      const response = await axios.get('https://www.qiniu.lingchen.kim/classify.json')
-      if (response.data.code === 200) {
-        articleTypes.value = response.data.data
-      }
-    } catch (error) {
-      console.error('Error fetching JSON data:', error)
-    }
-    // try {
-    //   const res = await ArticleService.getArticleTypes({})
-    //   if (res.code === ApiStatus.success) {
-    //     articleTypes.value = res.data
-    //   }
-    // } catch (err) { }
-  }
-
-  const getArticleDetail = async () => {
-    const res = await axios.get('https://www.qiniu.lingchen.kim/blog_list.json')
-
-    if (res.data.code === ApiStatus.success) {
-      let { title, blog_class, html_content } = res.data.data
-      articleName.value = title
-      articleType.value = Number(blog_class)
-      editorHtml.value = html_content
-    }
-  }
-
-  // const getOutline = (content: string) => {
-  //   const regex = /<h([1-3])>(.*?)<\/h\1>/g
-  //   const headings = []
-  //   let match
-
-  //   while ((match = regex.exec(content)) !== null) {
-  //     headings.push({ level: match[1], text: match[2] })
-  //   }
-  //   outlineList.value = headings
-  // }
-
-  // 提交
-  const submit = () => {
-    if (pageMode === PageModeEnum.Edit) {
-      editArticle()
-    } else {
-      addArticle()
-    }
-  }
-
-  // 格式化日期
-  const formDate = (date: string | Date): string => {
-    return useDateFormat(date, 'YYYY-MM-DD').value
-  }
-
-  // 验证输入
-  const validateArticle = () => {
-    if (!articleName.value) {
-      ElMessage.error(`请输入文章标题`)
-      return false
-    }
-
-    if (!articleType.value) {
-      ElMessage.error(`请选择文章类型`)
-      return false
-    }
-
-    if (editorHtml.value === '<p><br></p>') {
-      ElMessage.error(`请输入文章内容`)
-      return false
-    }
-
-    if (!cover.value) {
-      ElMessage.error(`请上传图片`)
-      return false
-    }
-
-    return true
-  }
-
-  // 添加文章
-  const addArticle = async () => {
-    try {
-      if (!validateArticle()) return
-      editorHtml.value = delCodeTrim(editorHtml.value)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  // 编辑文章
-  const editArticle = async () => {
-    try {
-      if (!validateArticle()) return
-
-      editorHtml.value = delCodeTrim(editorHtml.value)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  const delCodeTrim = (content: string): string => {
-    return content.replace(/(\s*)<\/code>/g, '</code>')
-  }
-
-  const onSuccess = (response: any) => {
-    cover.value = response.data.url
-    ElMessage.success(`图片上传成功 ${EmojiText[200]}`)
-  }
-
-  const onError = () => {
-    ElMessage.error(`图片上传失败 ${EmojiText[500]}`)
-  }
-
-  // 添加上传前的校验
-  const beforeUpload = (file: File) => {
-    const isImage = file.type.startsWith('image/')
-    const isLt2M = file.size / 1024 / 1024 < 2
-
-    if (!isImage) {
-      ElMessage.error('只能上传图片文件!')
-      return false
-    }
-    if (!isLt2M) {
-      ElMessage.error('图片大小不能超过 2MB!')
-      return false
-    }
-    return true
-  }
-</script>
 
 <style lang="scss" scoped>
   .article-edit {

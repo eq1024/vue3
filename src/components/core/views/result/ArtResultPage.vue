@@ -1,38 +1,42 @@
+<script setup lang="ts">
+defineOptions({ name: 'ArtResultPage' })
+
+withDefaults(defineProps<ResultPageProps>(), {
+  type: 'success',
+  title: '',
+  message: '',
+  iconCode: '',
+})
+
+interface ResultPageProps {
+  /** 成功/失败 */
+  type: 'success' | 'fail'
+  /** 标题 */
+  title: string
+  /** 消息 */
+  message: string
+  /** 图标 */
+  iconCode: string
+}
+</script>
+
 <template>
   <div class="page-content" :class="type">
-    <i class="iconfont-sys icon" v-html="iconCode"></i>
-    <h1 class="title">{{ title }}</h1>
-    <p class="msg">{{ message }}</p>
+    <i class="iconfont-sys icon" v-html="iconCode" />
+    <h1 class="title">
+      {{ title }}
+    </h1>
+    <p class="msg">
+      {{ message }}
+    </p>
     <div class="res">
-      <slot name="content"></slot>
+      <slot name="content" />
     </div>
     <div class="btn-group">
-      <slot name="buttons"></slot>
+      <slot name="buttons" />
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  defineOptions({ name: 'ArtResultPage' })
-
-  interface ResultPageProps {
-    /** 成功/失败 */
-    type: 'success' | 'fail'
-    /** 标题 */
-    title: string
-    /** 消息 */
-    message: string
-    /** 图标 */
-    iconCode: string
-  }
-
-  withDefaults(defineProps<ResultPageProps>(), {
-    type: 'success',
-    title: '',
-    message: '',
-    iconCode: ''
-  })
-</script>
 
 <style lang="scss" scoped>
   .page-content {

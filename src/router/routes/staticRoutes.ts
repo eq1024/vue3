@@ -1,4 +1,4 @@
-import { AppRouteRecordRaw } from '../utils/utils'
+import type { AppRouteRecordRaw } from '../utils/utils'
 import { RoutesAlias } from '../routesAlias'
 
 /**
@@ -10,19 +10,19 @@ export const staticRoutes: AppRouteRecordRaw[] = [
     path: RoutesAlias.Login,
     name: 'Login',
     component: () => import('@views/auth/login/index.vue'),
-    meta: { title: 'menus.login.title', isHideTab: true, setTheme: true }
+    meta: { title: 'menus.login.title', isHideTab: true, setTheme: true },
   },
   {
     path: RoutesAlias.Register,
     name: 'Register',
     component: () => import('@views/auth/register/index.vue'),
-    meta: { title: 'menus.register.title', isHideTab: true, noLogin: true, setTheme: true }
+    meta: { title: 'menus.register.title', isHideTab: true, noLogin: true, setTheme: true },
   },
   {
     path: RoutesAlias.ForgetPassword,
     name: 'ForgetPassword',
     component: () => import('@views/auth/forget-password/index.vue'),
-    meta: { title: 'menus.forgetPassword.title', isHideTab: true, noLogin: true, setTheme: true }
+    meta: { title: 'menus.forgetPassword.title', isHideTab: true, noLogin: true, setTheme: true },
   },
   {
     path: '/exception',
@@ -34,21 +34,21 @@ export const staticRoutes: AppRouteRecordRaw[] = [
         path: RoutesAlias.Exception403,
         name: 'Exception403',
         component: () => import('@views/exception/403/index.vue'),
-        meta: { title: '403' }
+        meta: { title: '403' },
       },
       {
         path: '/:catchAll(.*)',
         name: 'Exception404',
         component: () => import('@views/exception/404/index.vue'),
-        meta: { title: '404' }
+        meta: { title: '404' },
       },
       {
         path: RoutesAlias.Exception500,
         name: 'Exception500',
         component: () => import('@views/exception/500/index.vue'),
-        meta: { title: '500' }
-      }
-    ]
+        meta: { title: '500' },
+      },
+    ],
   },
   {
     path: '/outside',
@@ -60,8 +60,8 @@ export const staticRoutes: AppRouteRecordRaw[] = [
         path: '/outside/iframe/:path',
         name: 'Iframe',
         component: () => import('@/views/outside/Iframe.vue'),
-        meta: { title: 'iframe' }
-      }
-    ]
-  }
+        meta: { title: 'iframe' },
+      },
+    ],
+  },
 ]

@@ -1,3 +1,65 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import ArtCountTo from '@/components/core/text-effect/art-count-to/index.vue'
+
+// 控制变量
+const controlTarget = ref(0)
+const countToRef = ref()
+
+// 缓动动画目标值
+const easingTarget = ref(0)
+
+// 动画类型定义
+const easingTypes = [
+  { name: 'Linear', type: 'linear' },
+  { name: 'Ease Out Cubic', type: 'easeOutCubic' },
+  { name: 'Ease Out Expo', type: 'easeOutExpo' },
+  { name: 'Ease Out Sine', type: 'easeOutSine' },
+  { name: 'Ease In Out', type: 'easeInOutCubic' },
+  { name: 'Ease In Quad', type: 'easeInQuad' },
+] as const
+
+// 开始
+function startCount() {
+  const newTarget = 5000
+  controlTarget.value = newTarget
+  countToRef.value?.start(newTarget)
+}
+
+// 暂停
+function pauseCount() {
+  countToRef.value?.pause()
+}
+
+// 重置
+function resetCount() {
+  countToRef.value?.reset()
+  controlTarget.value = 0
+}
+
+// 触发缓动效果演示
+function triggerEasing() {
+  easingTarget.value = easingTarget.value === 0 ? 1000 : 0
+}
+
+// 监听动画事件
+function handleAnimationStarted(value: number) {
+  console.log('动画开始，目标值:', value)
+}
+
+function handleAnimationFinished(value: number) {
+  console.log('动画完成，最终值:', value)
+}
+
+function handleAnimationPaused(value: number) {
+  console.log('动画暂停，当前值:', value)
+}
+
+function handleAnimationReset() {
+  console.log('动画已重置')
+}
+</script>
+
 <template>
   <div class="page-content">
     <div class="page-header">
@@ -33,15 +95,19 @@
     <div class="demo-section">
       <h2>动画效果对比</h2>
       <div class="easing-demo">
-        <div class="easing-item" v-for="easing in easingTypes" :key="easing.type">
-          <div class="easing-label">{{ easing.name }}</div>
+        <div v-for="easing in easingTypes" :key="easing.type" class="easing-item">
+          <div class="easing-label">
+            {{ easing.name }}
+          </div>
           <div class="number-display">
             <ArtCountTo :target="easingTarget" :duration="3000" :easing="easing.type" />
           </div>
         </div>
       </div>
       <div class="trigger-center">
-        <el-button @click="triggerEasing">触发所有动画</el-button>
+        <el-button @click="triggerEasing">
+          触发所有动画
+        </el-button>
       </div>
     </div>
 
@@ -61,75 +127,19 @@
       </div>
 
       <div class="control-buttons">
-        <el-button @click="startCount">开始</el-button>
-        <el-button @click="pauseCount">暂停</el-button>
-        <el-button @click="resetCount">重置</el-button>
+        <el-button @click="startCount">
+          开始
+        </el-button>
+        <el-button @click="pauseCount">
+          暂停
+        </el-button>
+        <el-button @click="resetCount">
+          重置
+        </el-button>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref } from 'vue'
-  import ArtCountTo from '@/components/core/text-effect/art-count-to/index.vue'
-
-  // 控制变量
-  const controlTarget = ref(0)
-  const countToRef = ref()
-
-  // 缓动动画目标值
-  const easingTarget = ref(0)
-
-  // 动画类型定义
-  const easingTypes = [
-    { name: 'Linear', type: 'linear' },
-    { name: 'Ease Out Cubic', type: 'easeOutCubic' },
-    { name: 'Ease Out Expo', type: 'easeOutExpo' },
-    { name: 'Ease Out Sine', type: 'easeOutSine' },
-    { name: 'Ease In Out', type: 'easeInOutCubic' },
-    { name: 'Ease In Quad', type: 'easeInQuad' }
-  ] as const
-
-  // 开始
-  const startCount = () => {
-    const newTarget = 5000
-    controlTarget.value = newTarget
-    countToRef.value?.start(newTarget)
-  }
-
-  // 暂停
-  const pauseCount = () => {
-    countToRef.value?.pause()
-  }
-
-  // 重置
-  const resetCount = () => {
-    countToRef.value?.reset()
-    controlTarget.value = 0
-  }
-
-  // 触发缓动效果演示
-  const triggerEasing = () => {
-    easingTarget.value = easingTarget.value === 0 ? 1000 : 0
-  }
-
-  // 监听动画事件
-  const handleAnimationStarted = (value: number) => {
-    console.log('动画开始，目标值:', value)
-  }
-
-  const handleAnimationFinished = (value: number) => {
-    console.log('动画完成，最终值:', value)
-  }
-
-  const handleAnimationPaused = (value: number) => {
-    console.log('动画暂停，当前值:', value)
-  }
-
-  const handleAnimationReset = () => {
-    console.log('动画已重置')
-  }
-</script>
 
 <style scoped lang="scss">
   .page-content {

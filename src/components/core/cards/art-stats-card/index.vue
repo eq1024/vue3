@@ -1,22 +1,56 @@
 <!-- 统计卡片 -->
+<script setup lang="ts">
+defineOptions({ name: 'ArtStatsCard' })
+
+withDefaults(defineProps<StatsCardProps>(), {
+  iconSize: 30,
+  iconBgRadius: 50,
+})
+
+interface StatsCardProps {
+  /** 图标 */
+  icon?: string
+  /** 标题 */
+  title?: string
+  /** 数值 */
+  count?: number
+  /** 描述 */
+  description: string
+  /** 图标颜色 */
+  iconColor?: string
+  /** 图标背景颜色 */
+  iconBgColor?: string
+  /** 图标圆角大小 */
+  iconBgRadius?: number
+  /** 图标大小 */
+  iconSize?: number
+  /** 文本颜色 */
+  textColor?: string
+  /** 背景颜色 */
+  backgroundColor?: string
+  /** 是否显示箭头 */
+  showArrow?: boolean
+}
+</script>
+
 <template>
-  <div class="stats-card art-custom-card" :style="{ backgroundColor: backgroundColor }">
+  <div class="stats-card art-custom-card" :style="{ backgroundColor }">
     <div
       v-if="icon"
       class="stats-card__icon"
-      :style="{ backgroundColor: iconBgColor, borderRadius: iconBgRadius + 'px' }"
+      :style="{ backgroundColor: iconBgColor, borderRadius: `${iconBgRadius}px` }"
     >
       <i
         class="iconfont-sys"
-        v-html="icon"
         :style="{
           color: iconColor,
-          fontSize: iconSize + 'px'
+          fontSize: `${iconSize}px`,
         }"
-      ></i>
+        v-html="icon"
+      />
     </div>
     <div class="stats-card__content">
-      <p class="stats-card__title" :style="{ color: textColor }" v-if="title">
+      <p v-if="title" class="stats-card__title" :style="{ color: textColor }">
         {{ title }}
       </p>
       <ArtCountTo
@@ -26,49 +60,17 @@
         :duration="2000"
         separator=","
       />
-      <p class="stats-card__description" :style="{ color: textColor }" v-if="description">{{
-        description
-      }}</p>
+      <p v-if="description" class="stats-card__description" :style="{ color: textColor }">
+        {{
+          description
+        }}
+      </p>
     </div>
-    <div class="stats-card__arrow" v-if="showArrow">
+    <div v-if="showArrow" class="stats-card__arrow">
       <i class="iconfont-sys">&#xe703;</i>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  defineOptions({ name: 'ArtStatsCard' })
-
-  interface StatsCardProps {
-    /** 图标 */
-    icon?: string
-    /** 标题 */
-    title?: string
-    /** 数值 */
-    count?: number
-    /** 描述 */
-    description: string
-    /** 图标颜色 */
-    iconColor?: string
-    /** 图标背景颜色 */
-    iconBgColor?: string
-    /** 图标圆角大小 */
-    iconBgRadius?: number
-    /** 图标大小 */
-    iconSize?: number
-    /** 文本颜色 */
-    textColor?: string
-    /** 背景颜色 */
-    backgroundColor?: string
-    /** 是否显示箭头 */
-    showArrow?: boolean
-  }
-
-  withDefaults(defineProps<StatsCardProps>(), {
-    iconSize: 30,
-    iconBgRadius: 50
-  })
-</script>
 
 <style lang="scss" scoped>
   .stats-card {

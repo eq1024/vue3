@@ -1,6 +1,6 @@
-import { getTabConfig } from '@/utils/ui'
-import { useSettingStore } from '@/store/modules/setting'
 import { useMenuStore } from '@/store/modules/menu'
+import { useSettingStore } from '@/store/modules/setting'
+import { getTabConfig } from '@/utils/ui'
 
 // 通用函数
 export function useCommon() {
@@ -48,6 +48,6 @@ export function useCommon() {
     refresh,
     scrollToTop,
     containerMinHeight,
-    setContainerHeightCssVar
+    setContainerHeightCssVar,
   }
 }

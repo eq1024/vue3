@@ -1,44 +1,44 @@
+<script setup lang="ts">
+import axios from 'axios'
+import { useCommon } from '@/composables/useCommon'
+import '@/assets/styles/markdown.scss'
+import '@/assets/styles/one-dark-pro.scss'
+// import 'highlight.js/styles/atom-one-dark.css';
+// import 'highlight.js/styles/vs2015.css';
+
+defineOptions({ name: 'ArticleDetail' })
+
+const articleId = ref(0)
+const router = useRoute()
+const articleTitle = ref('')
+const articleHtml = ref('')
+
+onMounted(() => {
+  useCommon().scrollToTop()
+  articleId.value = Number(router.query.id)
+  getArticleDetail()
+})
+
+async function getArticleDetail() {
+  if (articleId.value) {
+    const res = await axios.get('https://www.qiniu.lingchen.kim/blog_detail.json')
+    if (res.data.code === 200) {
+      articleTitle.value = res.data.data.title
+      articleHtml.value = res.data.data.html_content
+    }
+  }
+}
+</script>
+
 <template>
   <div class="article-detail page-content">
     <div class="content">
       <h1>{{ articleTitle }}</h1>
-      <div class="markdown-body" v-highlight v-html="articleHtml"></div>
+      <div v-highlight class="markdown-body" v-html="articleHtml" />
     </div>
     <ArtBackToTop />
   </div>
 </template>
-
-<script setup lang="ts">
-  import '@/assets/styles/markdown.scss'
-  import '@/assets/styles/one-dark-pro.scss'
-  import { useCommon } from '@/composables/useCommon'
-  import axios from 'axios'
-  // import 'highlight.js/styles/atom-one-dark.css';
-  // import 'highlight.js/styles/vs2015.css';
-
-  defineOptions({ name: 'ArticleDetail' })
-
-  const articleId = ref(0)
-  const router = useRoute()
-  const articleTitle = ref('')
-  const articleHtml = ref('')
-
-  onMounted(() => {
-    useCommon().scrollToTop()
-    articleId.value = Number(router.query.id)
-    getArticleDetail()
-  })
-
-  const getArticleDetail = async () => {
-    if (articleId.value) {
-      const res = await axios.get('https://www.qiniu.lingchen.kim/blog_detail.json')
-      if (res.data.code === 200) {
-        articleTitle.value = res.data.data.title
-        articleHtml.value = res.data.data.html_content
-      }
-    }
-  }
-</script>
 
 <style lang="scss">
   .article-detail {

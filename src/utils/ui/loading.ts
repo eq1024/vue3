@@ -1,12 +1,12 @@
-import { fourDotsSpinnerSvg } from '@/assets/svg/loading'
 import { ElLoading } from 'element-plus'
+import { fourDotsSpinnerSvg } from '@/assets/svg/loading'
 
 const DEFAULT_LOADING_CONFIG = {
   lock: true,
   background: 'rgba(0, 0, 0, 0)',
   svg: fourDotsSpinnerSvg,
   svgViewBox: '0 0 40 40',
-  customClass: 'art-loading-fix'
+  customClass: 'art-loading-fix',
 } as const
 
 interface LoadingInstance {
@@ -35,5 +35,5 @@ export const loadingService = {
       loadingInstance.close()
       loadingInstance = null
     }
-  }
+  },
 }

@@ -1,54 +1,44 @@
 <!-- 环形图 -->
-<template>
-  <div
-    ref="chartRef"
-    class="art-ring-chart"
-    :style="{ height: props.height }"
-    v-loading="props.loading"
-  >
-    <ArtChartEmpty v-if="isEmpty" />
-  </div>
-</template>
-
 <script setup lang="ts">
-  import type { EChartsOption } from 'echarts'
-  import { useChartOps, useChartComponent } from '@/composables/useChart'
-  import type { RingChartProps } from '@/types/component/chart'
+import type { EChartsOption } from 'echarts'
+import type { RingChartProps } from '@/types/component/chart'
+import { useChartComponent, useChartOps } from '@/composables/useChart'
 
-  defineOptions({ name: 'ArtRingChart' })
+defineOptions({ name: 'ArtRingChart' })
 
-  const props = withDefaults(defineProps<RingChartProps>(), {
-    // 基础配置
-    height: useChartOps().chartHeight,
-    loading: false,
-    isEmpty: false,
-    colors: () => useChartOps().colors,
+const props = withDefaults(defineProps<RingChartProps>(), {
+  // 基础配置
+  height: useChartOps().chartHeight,
+  loading: false,
+  isEmpty: false,
+  colors: () => useChartOps().colors,
 
-    // 数据配置
-    data: () => [],
-    radius: () => ['50%', '80%'],
-    borderRadius: 10,
-    centerText: '',
-    showLabel: false,
+  // 数据配置
+  data: () => [],
+  radius: () => ['50%', '80%'],
+  borderRadius: 10,
+  centerText: '',
+  showLabel: false,
 
-    // 交互配置
-    showTooltip: true,
-    showLegend: false,
-    legendPosition: 'right'
-  })
+  // 交互配置
+  showTooltip: true,
+  showLegend: false,
+  legendPosition: 'right',
+})
 
-  // 使用新的图表组件抽象
-  const { chartRef, isDark, getAnimationConfig, getTooltipStyle, getLegendStyle, isEmpty } =
-    useChartComponent({
+// 使用新的图表组件抽象
+const { chartRef, isDark, getAnimationConfig, getTooltipStyle, getLegendStyle, isEmpty }
+    = useChartComponent({
       props,
       checkEmpty: () => {
-        return !props.data?.length || props.data.every((item) => item.value === 0)
+        return !props.data?.length || props.data.every(item => item.value === 0)
       },
       watchSources: [() => props.data, () => props.centerText],
       generateOptions: (): EChartsOption => {
         // 根据图例位置计算环形图中心位置
         const getCenterPosition = (): [string, string] => {
-          if (!props.showLegend) return ['50%', '50%']
+          if (!props.showLegend)
+            return ['50%', '50%']
 
           switch (props.legendPosition) {
             case 'left':
@@ -67,7 +57,7 @@
         const option: EChartsOption = {
           tooltip: props.showTooltip
             ? getTooltipStyle('item', {
-                formatter: '{b}: {c} ({d}%)'
+                formatter: '{b}: {c} ({d}%)',
               })
             : undefined,
           legend: props.showLegend ? getLegendStyle(props.legendPosition) : undefined,
@@ -81,34 +71,34 @@
               itemStyle: {
                 borderRadius: props.borderRadius,
                 borderColor: isDark.value ? '#2c2c2c' : '#fff',
-                borderWidth: 0
+                borderWidth: 0,
               },
               label: {
                 show: props.showLabel,
                 formatter: '{b}\n{d}%',
                 position: 'outside',
                 color: isDark.value ? '#ccc' : '#999',
-                fontSize: 12
+                fontSize: 12,
               },
               emphasis: {
                 label: {
                   show: false,
                   fontSize: 14,
-                  fontWeight: 'bold'
-                }
+                  fontWeight: 'bold',
+                },
               },
               labelLine: {
                 show: props.showLabel,
                 length: 15,
                 length2: 25,
-                smooth: true
+                smooth: true,
               },
               data: props.data,
               color: props.colors,
               ...getAnimationConfig(),
-              animationType: 'expansion'
-            }
-          ]
+              animationType: 'expansion',
+            },
+          ],
         }
 
         // 添加中心文字
@@ -123,15 +113,26 @@
             textStyle: {
               fontSize: 18,
               fontWeight: 500,
-              color: isDark.value ? '#999' : '#ADB0BC'
-            }
+              color: isDark.value ? '#999' : '#ADB0BC',
+            },
           }
         }
 
         return option
-      }
+      },
     })
 </script>
+
+<template>
+  <div
+    ref="chartRef"
+    v-loading="props.loading"
+    class="art-ring-chart"
+    :style="{ height: props.height }"
+  >
+    <ArtChartEmpty v-if="isEmpty" />
+  </div>
+</template>
 
 <style lang="scss" scoped>
   .art-ring-chart {

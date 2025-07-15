@@ -1,3 +1,54 @@
+<script lang="ts" setup>
+import type { IconfontType } from '@/utils/constants'
+import { ElMessage } from 'element-plus'
+import { extractIconClasses } from '@/utils/constants'
+
+const iconType = ref('unicode')
+const options = [
+  {
+    value: 'unicode',
+    label: 'Unicode',
+  },
+  {
+    value: 'fontClass',
+    label: 'Font class',
+  },
+]
+const systemIconClasses = ref<IconfontType[]>([])
+
+const isColorsIcon = ref(false)
+
+onMounted(() => {
+  systemIconClasses.value = extractIconClasses()
+})
+
+function copyIcon(text: IconfontType) {
+  if (!text)
+    return
+
+  const copyipt = document.createElement('input')
+  copyipt.setAttribute(
+    'value',
+    (iconType.value === 'unicode' ? text.unicode : text.className) || '',
+  )
+  document.body.appendChild(copyipt)
+  copyipt.select()
+  document.execCommand('copy')
+  document.body.removeChild(copyipt)
+
+  ElMessage.success(`已复制`)
+}
+
+function getRandomColor() {
+  const colors = ['#2d8cf0', '#19be6b', '#ff9900', '#f24965', '#9463f7']
+  return colors[Math.floor(Math.random() * colors.length)]
+}
+
+function getIconStyle() {
+  return isColorsIcon.value ? { color: getRandomColor() } : { color: 'var(--art-text-gray-700)' }
+}
+</script>
+
 <template>
   <div class="page-content">
     <div class="form">
@@ -17,67 +68,18 @@
       <ul class="icon-list">
         <li v-for="icon in systemIconClasses" :key="icon.className" @click="copyIcon(icon)">
           <i
-            class="iconfont-sys"
             v-if="iconType === 'unicode'"
-            v-html="icon.unicode"
+            class="iconfont-sys"
             :style="getIconStyle()"
-          ></i>
-          <i :class="`iconfont-sys ${icon.className}`" v-else :style="getIconStyle()"></i>
+            v-html="icon.unicode"
+          />
+          <i v-else :class="`iconfont-sys ${icon.className}`" :style="getIconStyle()" />
           <span>{{ iconType === 'unicode' ? icon.unicode : icon.className }}</span>
         </li>
       </ul>
     </div>
   </div>
 </template>
-
-<script lang="ts" setup>
-  import { extractIconClasses, IconfontType } from '@/utils/constants'
-  import { ElMessage } from 'element-plus'
-
-  const iconType = ref('unicode')
-  const options = [
-    {
-      value: 'unicode',
-      label: 'Unicode'
-    },
-    {
-      value: 'fontClass',
-      label: 'Font class'
-    }
-  ]
-  const systemIconClasses = ref<IconfontType[]>([])
-
-  const isColorsIcon = ref(false)
-
-  onMounted(() => {
-    systemIconClasses.value = extractIconClasses()
-  })
-
-  const copyIcon = (text: IconfontType) => {
-    if (!text) return
-
-    let copyipt = document.createElement('input')
-    copyipt.setAttribute(
-      'value',
-      (iconType.value === 'unicode' ? text.unicode : text.className) || ''
-    )
-    document.body.appendChild(copyipt)
-    copyipt.select()
-    document.execCommand('copy')
-    document.body.removeChild(copyipt)
-
-    ElMessage.success(`已复制`)
-  }
-
-  const getRandomColor = () => {
-    const colors = ['#2d8cf0', '#19be6b', '#ff9900', '#f24965', '#9463f7']
-    return colors[Math.floor(Math.random() * colors.length)]
-  }
-
-  const getIconStyle = () => {
-    return isColorsIcon.value ? { color: getRandomColor() } : { color: 'var(--art-text-gray-700)' }
-  }
-</script>
 
 <style lang="scss" scoped>
   .page-content {

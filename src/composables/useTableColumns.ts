@@ -1,11 +1,11 @@
 // 动态列配置
 
-import { ref, computed } from 'vue'
-import { $t } from '@/locales'
 import type { ColumnOption } from '@/types/component'
+import { computed, ref } from 'vue'
+import { $t } from '@/locales'
 
 // 工具函数：根据列配置生成列选择状态
-const getColumnChecks = <T>(columns: ColumnOption<T>[]): ColumnOption<T>[] => {
+function getColumnChecks<T>(columns: ColumnOption<T>[]): ColumnOption<T>[] {
   const checks: ColumnOption<T>[] = []
 
   columns.forEach((column) => {
@@ -14,26 +14,29 @@ const getColumnChecks = <T>(columns: ColumnOption<T>[]): ColumnOption<T>[] => {
         ...column,
         prop: '__selection__',
         label: $t('table.column.selection'),
-        checked: true
+        checked: true,
       })
-    } else if (column.type === 'expand') {
+    }
+    else if (column.type === 'expand') {
       checks.push({
         ...column,
         prop: '__expand__',
         label: $t('table.column.expand'),
-        checked: true
+        checked: true,
       })
-    } else if (column.type === 'index') {
+    }
+    else if (column.type === 'index') {
       checks.push({
         ...column,
         prop: '__index__',
         label: $t('table.column.index'),
-        checked: true
+        checked: true,
       })
-    } else {
+    }
+    else {
       checks.push({
         ...column,
-        checked: true
+        checked: true,
       })
     }
   })
@@ -57,22 +60,25 @@ export function useTableColumns<T = any>(columnsFactory: () => ColumnOption<T>[]
     cols.forEach((column) => {
       if (column.type === 'selection') {
         columnMap.set('__selection__', column)
-      } else if (column.type === 'expand') {
+      }
+      else if (column.type === 'expand') {
         columnMap.set('__expand__', column)
-      } else if (column.type === 'index') {
+      }
+      else if (column.type === 'index') {
         columnMap.set('__index__', column)
-      } else {
+      }
+      else {
         columnMap.set(column.prop as string, column)
       }
     })
 
     return columnChecks.value
-      .filter((item) => item.checked)
-      .map((check) => columnMap.get(check.prop as string) as ColumnOption<T>)
+      .filter(item => item.checked)
+      .map(check => columnMap.get(check.prop as string) as ColumnOption<T>)
   })
 
   return {
     columns,
-    columnChecks
+    columnChecks,
   }
 }

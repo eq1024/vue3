@@ -15,9 +15,9 @@ store.use(
     storage: localStorage,
     serializer: {
       serialize: JSON.stringify,
-      deserialize: JSON.parse
-    }
-  })
+      deserialize: JSON.parse,
+    },
+  }),
 )
 
 /**

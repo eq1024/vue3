@@ -1,3 +1,48 @@
+<script lang="ts" setup>
+import type { PropType } from 'vue'
+import type { AppRouteRecord } from '@/types/router'
+import { computed } from 'vue'
+import { formatMenuTitle } from '@/router/utils/utils'
+import { handleMenuJump } from '@/utils/navigation'
+
+const props = defineProps({
+  item: {
+    type: Object as PropType<AppRouteRecord>,
+    required: true,
+  },
+  theme: {
+    type: Object,
+    default: () => ({}),
+  },
+  isMobile: Boolean,
+  level: {
+    type: Number,
+    default: 0,
+  },
+})
+
+const emit = defineEmits(['close'])
+
+// 过滤后的子菜单项（不包含隐藏的）
+const filteredChildren = computed(() => {
+  return props.item.children?.filter(child => !child.meta.isHide) || []
+})
+
+// 计算当前项是否有可见的子菜单
+const hasChildren = computed(() => {
+  return filteredChildren.value.length > 0
+})
+
+function goPage(item: AppRouteRecord) {
+  closeMenu()
+  handleMenuJump(item)
+}
+
+function closeMenu() {
+  emit('close')
+}
+</script>
+
 <template>
   <ElSubMenu v-if="hasChildren" :index="item.path || item.meta.title">
     <template #title>
@@ -5,7 +50,7 @@
         class="menu-icon iconfont-sys"
         :style="{ color: theme?.iconColor }"
         v-html="item.meta.icon"
-      ></i>
+      />
       <span>{{ formatMenuTitle(item.meta.title) }}</span>
       <div v-if="item.meta.showBadge" class="art-badge art-badge-horizontal" />
       <div v-if="item.meta.showTextBadge" class="art-text-badge">
@@ -34,7 +79,7 @@
       class="menu-icon iconfont-sys"
       :style="{ color: theme?.iconColor }"
       v-html="item.meta.icon"
-    ></i>
+    />
     <span>{{ formatMenuTitle(item.meta.title) }}</span>
     <div
       v-if="item.meta.showBadge"
@@ -46,50 +91,6 @@
     </div>
   </ElMenuItem>
 </template>
-
-<script lang="ts" setup>
-  import { computed, type PropType } from 'vue'
-  import { AppRouteRecord } from '@/types/router'
-  import { handleMenuJump } from '@/utils/navigation'
-  import { formatMenuTitle } from '@/router/utils/utils'
-
-  const props = defineProps({
-    item: {
-      type: Object as PropType<AppRouteRecord>,
-      required: true
-    },
-    theme: {
-      type: Object,
-      default: () => ({})
-    },
-    isMobile: Boolean,
-    level: {
-      type: Number,
-      default: 0
-    }
-  })
-
-  const emit = defineEmits(['close'])
-
-  // 过滤后的子菜单项（不包含隐藏的）
-  const filteredChildren = computed(() => {
-    return props.item.children?.filter((child) => !child.meta.isHide) || []
-  })
-
-  // 计算当前项是否有可见的子菜单
-  const hasChildren = computed(() => {
-    return filteredChildren.value.length > 0
-  })
-
-  const goPage = (item: AppRouteRecord) => {
-    closeMenu()
-    handleMenuJump(item)
-  }
-
-  const closeMenu = () => {
-    emit('close')
-  }
-</script>
 
 <style lang="scss" scoped>
   .el-sub-menu {

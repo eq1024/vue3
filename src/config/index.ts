@@ -1,9 +1,9 @@
+import type { SystemConfig } from '@/types/config'
 /**
  * 系统配置
  * 包含：系统信息、系统主题、菜单主题、菜单布局、系统主色、系统主色列表、系统主色、系统其他项默认配置、快速入口配置
  */
 import { MenuThemeEnum, MenuTypeEnum, SystemThemeEnum } from '@/enums/appEnum'
-import { SystemConfig } from '@/types/config'
 import { configImages } from './assets/images'
 import fastEnterConfig from './fastEnter'
 import { headerBarConfig } from './headerBar'
@@ -11,16 +11,16 @@ import { headerBarConfig } from './headerBar'
 const appConfig: SystemConfig = {
   // 系统信息
   systemInfo: {
-    name: 'Art Design Pro' // 系统名称
+    name: 'Art Design Pro', // 系统名称
   },
   // Element Plus 主题
   elementPlusTheme: {
-    primary: '#5D87FF'
+    primary: '#5D87FF',
   },
   // 系统主题
   systemThemeStyles: {
     [SystemThemeEnum.LIGHT]: { className: '' },
-    [SystemThemeEnum.DARK]: { className: SystemThemeEnum.DARK }
+    [SystemThemeEnum.DARK]: { className: SystemThemeEnum.DARK },
   },
   // 系统主题列表
   settingThemeList: [
@@ -30,7 +30,7 @@ const appConfig: SystemConfig = {
       color: ['#fff', '#fff'],
       leftLineColor: '#EDEEF0',
       rightLineColor: '#EDEEF0',
-      img: configImages.themeStyles.light
+      img: configImages.themeStyles.light,
     },
     {
       name: 'Dark',
@@ -38,7 +38,7 @@ const appConfig: SystemConfig = {
       color: ['#22252A'],
       leftLineColor: '#3F4257',
       rightLineColor: '#3F4257',
-      img: configImages.themeStyles.dark
+      img: configImages.themeStyles.dark,
     },
     {
       name: 'System',
@@ -46,15 +46,15 @@ const appConfig: SystemConfig = {
       color: ['#fff', '#22252A'],
       leftLineColor: '#EDEEF0',
       rightLineColor: '#3F4257',
-      img: configImages.themeStyles.system
-    }
+      img: configImages.themeStyles.system,
+    },
   ],
   // 菜单布局列表
   menuLayoutList: [
     { name: 'Left', value: MenuTypeEnum.LEFT, img: configImages.menuLayouts.vertical },
     { name: 'Top', value: MenuTypeEnum.TOP, img: configImages.menuLayouts.horizontal },
     { name: 'Mixed', value: MenuTypeEnum.TOP_LEFT, img: configImages.menuLayouts.mixed },
-    { name: 'Dual Column', value: MenuTypeEnum.DUAL_MENU, img: configImages.menuLayouts.dualColumn }
+    { name: 'Dual Column', value: MenuTypeEnum.DUAL_MENU, img: configImages.menuLayouts.dualColumn },
   ],
   // 菜单主题列表
   themeList: [
@@ -70,7 +70,7 @@ const appConfig: SystemConfig = {
       systemBackground: '#FAFBFC',
       leftLineColor: '#EDEEF0',
       rightLineColor: '#EDEEF0',
-      img: configImages.menuStyles.design
+      img: configImages.menuStyles.design,
     },
     {
       theme: MenuThemeEnum.DARK,
@@ -84,7 +84,7 @@ const appConfig: SystemConfig = {
       systemBackground: '#F8F8F8',
       leftLineColor: '#3F4257',
       rightLineColor: '#EDEEF0',
-      img: configImages.menuStyles.dark
+      img: configImages.menuStyles.dark,
     },
     {
       theme: MenuThemeEnum.LIGHT,
@@ -98,8 +98,8 @@ const appConfig: SystemConfig = {
       systemBackground: '#F8F8F8',
       leftLineColor: '#EDEEF0',
       rightLineColor: '#EDEEF0',
-      img: configImages.menuStyles.light
-    }
+      img: configImages.menuStyles.light,
+    },
   ],
 
   darkMenuStyles: [
@@ -114,8 +114,8 @@ const appConfig: SystemConfig = {
       tabBarBackground: '#FFFFFF',
       systemBackground: '#F8F8F8',
       leftLineColor: '#3F4257',
-      rightLineColor: '#EDEEF0'
-    }
+      rightLineColor: '#EDEEF0',
+    },
   ],
   // 系统主色
   systemMainColor: [
@@ -125,18 +125,18 @@ const appConfig: SystemConfig = {
     '#60C041',
     '#38C0FC',
     '#F9901F',
-    '#FF80C8'
+    '#FF80C8',
   ] as const,
   // 系统其他项默认配置
   systemSetting: {
     defaultMenuWidth: 240, // 菜单宽度
     defaultCustomRadius: '0.75', // 自定义圆角
-    defaultTabStyle: 'tab-default' // 标签样式
+    defaultTabStyle: 'tab-default', // 标签样式
   },
   // 快速入口配置
   fastEnter: fastEnterConfig,
   // 顶部栏功能配置
-  headerBar: headerBarConfig
+  headerBar: headerBarConfig,
 }
 
 export default Object.freeze(appConfig)

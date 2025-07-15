@@ -1,26 +1,27 @@
-import { ref, reactive, computed, onMounted, onUnmounted, nextTick, readonly } from 'vue'
-import { useWindowSize } from '@vueuse/core'
-import { useTableColumns } from './useTableColumns'
+import type { ApiResponse } from '../utils/table/tableCache'
+import type { BaseRequestParams, TableError } from '../utils/table/tableUtils'
 import type { ColumnOption } from '@/types/component'
+import { useWindowSize } from '@vueuse/core'
 
+import { computed, nextTick, onMounted, onUnmounted, reactive, readonly, ref } from 'vue'
 // 导入拆分的模块
-import { TableCache, CacheInvalidationStrategy, type ApiResponse } from '../utils/table/tableCache'
-
+import { CacheInvalidationStrategy, TableCache } from '../utils/table/tableCache'
 import {
-  type BaseRequestParams,
-  type TableError,
+
+  createErrorHandler,
+  createSmartDebounce,
   defaultResponseAdapter,
   extractTableData,
   updatePaginationFromResponse,
-  createSmartDebounce,
-  createErrorHandler
 } from '../utils/table/tableUtils'
+
+import { useTableColumns } from './useTableColumns'
 
 // 🚀 优化的配置接口 - 按功能域分组
 export interface UseTableConfig<
   T = unknown,
   P extends BaseRequestParams = BaseRequestParams,
-  R = any
+  R = any,
 > {
   // 🔧 核心配置
   core: {
@@ -96,7 +97,7 @@ export interface UseTableConfig<
  * - 列配置管理
  */
 export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestParams, R = any>(
-  config: UseTableConfig<T, P, R>
+  config: UseTableConfig<T, P, R>,
 ) {
   // 🔧 解构优化后的配置
   const {
@@ -105,17 +106,17 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
       apiParams = {} as Partial<P>,
       immediate = true,
       columnsFactory,
-      paginationKey = { current: 'current', size: 'size' }
+      paginationKey = { current: 'current', size: 'size' },
     },
     transform: { dataTransformer, responseAdapter = defaultResponseAdapter } = {},
     performance: {
       enableCache = false,
       cacheTime = 5 * 60 * 1000,
       debounceTime = 300,
-      maxCacheSize = 50
+      maxCacheSize = 50,
     } = {},
     hooks: { onSuccess, onError, onCacheHit, resetFormCallback } = {},
-    debug: { enableLog = false } = {}
+    debug: { enableLog = false } = {},
   } = config
 
   // 🔧 分页字段名配置
@@ -141,7 +142,7 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
       if (enableLog) {
         console.error(`[useTable] ${message}`, ...args)
       }
-    }
+    },
   }
 
   // 缓存实例
@@ -167,24 +168,24 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
     Object.assign(
       {
         [pageKey]: 1,
-        [sizeKey]: 10
+        [sizeKey]: 10,
       },
-      apiParams || {}
-    ) as P
+      apiParams || {},
+    ) as P,
   )
 
   // 分页配置
   const pagination = reactive<Api.Common.PaginatingParams>({
     current: (searchParams as any)[pageKey] || 1,
     size: (searchParams as any)[sizeKey] || 10,
-    total: 0
+    total: 0,
   })
 
   // 移动端分页 (响应式)
   const { width } = useWindowSize()
   const mobilePagination = computed(() => ({
     ...pagination,
-    small: width.value < 768
+    small: width.value < 768,
   }))
 
   // 列配置
@@ -199,7 +200,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
   const cacheStats = computed(() => {
     // 依赖触发器，确保缓存变化时重新计算
     void cacheUpdateTrigger.value
-    if (!cache) return { total: 0, size: '0KB', hitRate: '0 avg hits' }
+    if (!cache)
+      return { total: 0, size: '0KB', hitRate: '0 avg hits' }
     return cache.getStats()
   })
 
@@ -208,7 +210,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
 
   // 智能缓存失效处理
   const invalidateCache = (strategy: CacheInvalidationStrategy, context?: string): void => {
-    if (!cache) return
+    if (!cache)
+      return
 
     let clearedCount = 0
 
@@ -240,7 +243,7 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
   // 获取数据的核心方法
   const fetchData = async (
     params?: Partial<P>,
-    useCache = enableCache
+    useCache = enableCache,
   ): Promise<ApiResponse<T>> => {
     // 取消上一个请求
     if (abortController) {
@@ -260,9 +263,9 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
         searchParams,
         {
           [pageKey]: pagination.current,
-          [sizeKey]: pagination.size
+          [sizeKey]: pagination.size,
         },
-        params || {}
+        params || {},
       ) as P
 
       // 检查缓存
@@ -336,7 +339,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
       }
 
       return standardResponse
-    } catch (err) {
+    }
+    catch (err) {
       if (err instanceof Error && err.message === '请求已取消') {
         // 请求被取消，不做处理
         return { records: [], total: 0, current: 1, size: 10 }
@@ -345,7 +349,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
       data.value = []
       const tableError = handleError(err, '获取表格数据失败')
       throw tableError
-    } finally {
+    }
+    finally {
       loading.value = false
       // 只有当前控制器是活跃的才清空
       if (abortController === currentController) {
@@ -358,7 +363,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
   const getData = async (params?: Partial<P>): Promise<ApiResponse<T> | void> => {
     try {
       return await fetchData(params)
-    } catch {
+    }
+    catch {
       // 错误已在 fetchData 中处理
       return Promise.resolve()
     }
@@ -374,7 +380,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
 
     try {
       return await fetchData(params, false) // 搜索时不使用缓存
-    } catch {
+    }
+    catch {
       // 错误已在 fetchData 中处理
       return Promise.resolve()
     }
@@ -391,7 +398,7 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
     // 保存分页相关的默认值
     const defaultPagination = {
       [pageKey]: 1,
-      [sizeKey]: (searchParams as any)[sizeKey] || 10
+      [sizeKey]: (searchParams as any)[sizeKey] || 10,
     }
 
     // 清空所有搜索参数
@@ -427,7 +434,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
 
   // 处理分页大小变化
   const handleSizeChange = async (newSize: number): Promise<void> => {
-    if (newSize <= 0) return
+    if (newSize <= 0)
+      return
 
     debouncedGetDataByPage.cancel()
 
@@ -443,7 +451,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
 
   // 处理当前页变化
   const handleCurrentChange = async (newCurrent: number): Promise<void> => {
-    if (newCurrent <= 0) return
+    if (newCurrent <= 0)
+      return
 
     // 🔧 修复：防止重复调用
     if (isCurrentChanging) {
@@ -467,7 +476,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
       }
 
       await getData()
-    } finally {
+    }
+    finally {
       isCurrentChanging = false
     }
   }
@@ -531,7 +541,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
 
   // 手动清理过期缓存
   const cleanupExpiredCache = (): number => {
-    if (!cache) return 0
+    if (!cache)
+      return 0
     const cleanedCount = cache.cleanupExpired()
     if (cleanedCount > 0) {
       // 手动触发缓存状态更新
@@ -613,8 +624,8 @@ export function useTable<T = unknown, P extends BaseRequestParams = BaseRequestP
     // 列配置 (如果提供了 columnsFactory)
     ...(columnConfig && {
       columns,
-      columnChecks
-    })
+      columnChecks,
+    }),
   }
 }
 

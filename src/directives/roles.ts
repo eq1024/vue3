@@ -1,5 +1,5 @@
+import type { App, Directive, DirectiveBinding } from 'vue'
 import { useUserStore } from '@/store/modules/user'
-import { App, Directive, DirectiveBinding } from 'vue'
 
 /**
  * 角色权限指令
@@ -43,7 +43,7 @@ function removeElement(el: HTMLElement): void {
 
 const rolesDirective: Directive = {
   mounted: checkRolePermission,
-  updated: checkRolePermission
+  updated: checkRolePermission,
 }
 
 export function setupRolesDirective(app: App): void {

@@ -1,17 +1,17 @@
+<script setup lang="ts">
+interface Props {
+  title: string
+  style?: Record<string, any>
+}
+
+defineProps<Props>()
+</script>
+
 <template>
   <p class="section-title" :style="style">
     {{ title }}
   </p>
 </template>
-
-<script setup lang="ts">
-  interface Props {
-    title: string
-    style?: Record<string, any>
-  }
-
-  defineProps<Props>()
-</script>
 
 <style lang="scss" scoped>
   .section-title {

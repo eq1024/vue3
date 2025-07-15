@@ -1,3 +1,46 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { reactive } from 'vue'
+import { useSettingStore } from '@/store/modules/setting'
+
+const { showWorkTab } = storeToRefs(useSettingStore())
+
+const dataList = reactive([
+  {
+    des: '总访问次数',
+    icon: '&#xe721;',
+    startVal: 0,
+    duration: 1000,
+    num: 9120,
+    change: '+20%',
+  },
+  {
+    des: '在线访客数',
+    icon: '&#xe724;',
+    startVal: 0,
+    duration: 1000,
+    num: 182,
+    change: '+10%',
+  },
+  {
+    des: '点击量',
+    icon: '&#xe7aa;',
+    startVal: 0,
+    duration: 1000,
+    num: 9520,
+    change: '-12%',
+  },
+  {
+    des: '新用户',
+    icon: '&#xe82a;',
+    startVal: 0,
+    duration: 1000,
+    num: 156,
+    change: '+30%',
+  },
+])
+</script>
+
 <template>
   <el-row :gutter="20" :style="{ marginTop: showWorkTab ? '0' : '10px' }" class="card-list">
     <el-col v-for="(item, index) in dataList" :key="index" :sm="12" :md="6" :lg="6">
@@ -8,59 +51,16 @@
           <span class="change-text">较上周</span>
           <span
             class="change"
-            :class="[item.change.indexOf('+') === -1 ? 'text-danger' : 'text-success']"
+            :class="[!item.change.includes('+') ? 'text-danger' : 'text-success']"
           >
             {{ item.change }}
           </span>
         </div>
-        <i class="iconfont-sys" v-html="item.icon"></i>
+        <i class="iconfont-sys" v-html="item.icon" />
       </div>
     </el-col>
   </el-row>
 </template>
-
-<script setup lang="ts">
-  import { reactive } from 'vue'
-  import { storeToRefs } from 'pinia'
-  import { useSettingStore } from '@/store/modules/setting'
-
-  const { showWorkTab } = storeToRefs(useSettingStore())
-
-  const dataList = reactive([
-    {
-      des: '总访问次数',
-      icon: '&#xe721;',
-      startVal: 0,
-      duration: 1000,
-      num: 9120,
-      change: '+20%'
-    },
-    {
-      des: '在线访客数',
-      icon: '&#xe724;',
-      startVal: 0,
-      duration: 1000,
-      num: 182,
-      change: '+10%'
-    },
-    {
-      des: '点击量',
-      icon: '&#xe7aa;',
-      startVal: 0,
-      duration: 1000,
-      num: 9520,
-      change: '-12%'
-    },
-    {
-      des: '新用户',
-      icon: '&#xe82a;',
-      startVal: 0,
-      duration: 1000,
-      num: 156,
-      change: '+30%'
-    }
-  ])
-</script>
 
 <style lang="scss" scoped>
   .card-list {

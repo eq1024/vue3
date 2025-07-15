@@ -1,5 +1,5 @@
+import type { App, Directive, DirectiveBinding } from 'vue'
 import { router } from '@/router'
-import { App, Directive, DirectiveBinding } from 'vue'
 
 /**
  * 权限指令（后端控制模式可用）
@@ -16,7 +16,7 @@ function checkAuthPermission(el: HTMLElement, binding: AuthBinding): void {
   const authList = (router.currentRoute.value.meta.authList as Array<{ authMark: string }>) || []
 
   // 检查是否有对应的权限标识
-  const hasPermission = authList.some((item) => item.authMark === binding.value)
+  const hasPermission = authList.some(item => item.authMark === binding.value)
 
   // 如果没有权限，移除元素
   if (!hasPermission) {
@@ -32,7 +32,7 @@ function removeElement(el: HTMLElement): void {
 
 const authDirective: Directive = {
   mounted: checkAuthPermission,
-  updated: checkAuthPermission
+  updated: checkAuthPermission,
 }
 
 export function setupAuthDirective(app: App): void {

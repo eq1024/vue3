@@ -1,3 +1,9 @@
+<script setup lang="ts">
+defineEmits<{
+  close: []
+}>()
+</script>
+
 <template>
   <div class="setting-header">
     <div class="close-wrap">
@@ -5,12 +11,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  defineEmits<{
-    close: []
-  }>()
-</script>
 
 <style lang="scss" scoped>
   .setting-header {

@@ -4,10 +4,10 @@
  */
 import type { Router, RouteRecordRaw } from 'vue-router'
 import type { AppRouteRecord } from '@/types/router'
-import { saveIframeRoutes } from './menuToRouter'
-import { RoutesAlias } from '../routesAlias'
 import { h } from 'vue'
 import { useMenuStore } from '@/store/modules/menu'
+import { RoutesAlias } from '../routesAlias'
+import { saveIframeRoutes } from './menuToRouter'
 
 /**
  * 动态导入 views 目录下所有 .vue 组件
@@ -73,7 +73,8 @@ function checkDuplicateRoutes(routes: AppRouteRecord[], parentPath = ''): void {
       if (route.name) {
         if (routeNameMap.has(String(route.name))) {
           console.warn(`[路由警告] 名称重复: "${String(route.name)}"`)
-        } else {
+        }
+        else {
           routeNameMap.set(String(route.name), fullPath)
         }
       }
@@ -87,7 +88,8 @@ function checkDuplicateRoutes(routes: AppRouteRecord[], parentPath = ''): void {
 
           if (componentPathMap.has(componentKey)) {
             console.warn(`[路由警告] 路径重复: "${componentPath}"`)
-          } else {
+          }
+          else {
             componentPathMap.set(componentKey, fullPath)
           }
         }
@@ -134,7 +136,7 @@ function loadComponent(componentPath: string, routeName: string): () => Promise<
       Promise.resolve({
         render() {
           return h('div', {})
-        }
+        },
       })
   }
 
@@ -147,13 +149,13 @@ function loadComponent(componentPath: string, routeName: string): () => Promise<
 
   if (!module) {
     console.error(
-      `[路由错误] 未找到组件：${routeName}，尝试过的路径: ${fullPath} 和 ${fullPathWithIndex}`
+      `[路由错误] 未找到组件：${routeName}，尝试过的路径: ${fullPath} 和 ${fullPathWithIndex}`,
     )
     return () =>
       Promise.resolve({
         render() {
           return h('div', `组件未找到: ${routeName}`)
-        }
+        },
       })
   }
 
@@ -175,14 +177,14 @@ interface ConvertedRoute extends Omit<RouteRecordRaw, 'children'> {
 function convertRouteComponent(
   route: AppRouteRecord,
   iframeRoutes: AppRouteRecord[],
-  depth = 0
+  depth = 0,
 ): ConvertedRoute {
   const { component, children, ...routeConfig } = route
 
   // 基础路由配置
   const converted: ConvertedRoute = {
     ...routeConfig,
-    component: undefined
+    component: undefined,
   }
 
   // 是否为一级菜单
@@ -190,16 +192,18 @@ function convertRouteComponent(
 
   if (route.meta.isIframe) {
     handleIframeRoute(converted, route, iframeRoutes)
-  } else if (isFirstLevel) {
+  }
+  else if (isFirstLevel) {
     handleLayoutRoute(converted, route, component as string)
-  } else {
+  }
+  else {
     handleNormalRoute(converted, component as string, String(route.name))
   }
 
   // 递归时增加深度
   if (children?.length) {
-    converted.children = children.map((child) =>
-      convertRouteComponent(child, iframeRoutes, depth + 1)
+    converted.children = children.map(child =>
+      convertRouteComponent(child, iframeRoutes, depth + 1),
     )
   }
 
@@ -212,7 +216,7 @@ function convertRouteComponent(
 function handleIframeRoute(
   converted: ConvertedRoute,
   route: AppRouteRecord,
-  iframeRoutes: AppRouteRecord[]
+  iframeRoutes: AppRouteRecord[],
 ): void {
   converted.path = `/outside/iframe/${String(route.name)}`
   converted.component = () => import('@/views/outside/Iframe.vue')
@@ -225,7 +229,7 @@ function handleIframeRoute(
 function handleLayoutRoute(
   converted: ConvertedRoute,
   route: AppRouteRecord,
-  component: string | undefined
+  component: string | undefined,
 ): void {
   converted.component = () => import('@/views/index/index.vue')
   converted.path = `/${(route.path?.split('/')[1] || '').trim()}`
@@ -235,8 +239,8 @@ function handleLayoutRoute(
   converted.children = [
     {
       ...route,
-      component: loadComponent(component as string, String(route.name))
-    } as ConvertedRoute
+      component: loadComponent(component as string, String(route.name)),
+    } as ConvertedRoute,
   ]
 }
 
@@ -246,7 +250,7 @@ function handleLayoutRoute(
 function handleNormalRoute(
   converted: ConvertedRoute,
   component: string | undefined,
-  routeName: string
+  routeName: string,
 ): void {
   if (component) {
     const aliasComponent = RoutesAlias[

@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import { storeToRefs } from 'pinia'
+import { useSettingStore } from '@/store/modules/setting'
+import { useSettingsConfig } from '../composables/useSettingsConfig'
+import { useSettingsHandlers } from '../composables/useSettingsHandlers'
+import SectionTitle from './SectionTitle.vue'
+
+const settingStore = useSettingStore()
+const { systemThemeColor } = storeToRefs(settingStore)
+const { configOptions } = useSettingsConfig()
+const { colorHandlers } = useSettingsHandlers()
+</script>
+
 <template>
   <div class="color-settings">
     <SectionTitle :title="$t('setting.color.title')" style="margin-top: 40px" />
@@ -9,25 +22,12 @@
           :style="{ background: `${color} !important` }"
           @click="colorHandlers.selectColor(color)"
         >
-          <i class="iconfont-sys" v-show="color === systemThemeColor">&#xe616;</i>
+          <i v-show="color === systemThemeColor" class="iconfont-sys">&#xe616;</i>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import SectionTitle from './SectionTitle.vue'
-  import { useSettingStore } from '@/store/modules/setting'
-  import { useSettingsConfig } from '../composables/useSettingsConfig'
-  import { useSettingsHandlers } from '../composables/useSettingsHandlers'
-  import { storeToRefs } from 'pinia'
-
-  const settingStore = useSettingStore()
-  const { systemThemeColor } = storeToRefs(settingStore)
-  const { configOptions } = useSettingsConfig()
-  const { colorHandlers } = useSettingsHandlers()
-</script>
 
 <style lang="scss" scoped>
   .color-settings {

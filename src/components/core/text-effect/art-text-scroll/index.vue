@@ -1,4 +1,133 @@
 <!-- 文字滚动组件，支持5种样式类型，两种滚动方向，可自定义 HTML 内容 -->
+<script setup lang="ts">
+import { useElementHover } from '@vueuse/core'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+
+defineOptions({ name: 'ArtTextScroll' })
+
+const props = withDefaults(defineProps<Props>(), {
+  speed: 70,
+  direction: 'left',
+  type: 'default',
+  showClose: false,
+  typewriter: false,
+  typewriterSpeed: 100,
+})
+
+const emit = defineEmits(['close'])
+
+interface Props {
+  /** 文本 */
+  text: string
+  /** 滚动速度 */
+  speed?: number
+  /** 滚动方向 左/右 */
+  direction?: 'left' | 'right'
+  /** 类型 默认/成功/警告/危险/信息 */
+  type?: 'default' | 'success' | 'warning' | 'danger' | 'info'
+  /** 是否显示关闭按钮 */
+  showClose?: boolean
+  /** 是否启用打字机效果 */
+  typewriter?: boolean
+  /** 打字机速度 */
+  typewriterSpeed?: number
+}
+
+// 状态管理
+const containerRef = ref<HTMLElement | null>(null)
+const isHovered = useElementHover(containerRef)
+const scrollContent = ref<HTMLElement | null>(null)
+const animationDuration = ref(0)
+
+// 添加打字机效果相关的响应式变量
+const currentText = ref('')
+let typewriterTimer: ReturnType<typeof setTimeout> | null = null
+
+// 添加打字机完成状态
+const isTypewriterComplete = ref(false)
+
+// 修改滚动状态计算属性
+const shouldScroll = computed(() => {
+  if (props.typewriter) {
+    return !isHovered.value && isTypewriterComplete.value
+  }
+  return !isHovered.value
+})
+
+// 修改 sanitizedContent 计算属性
+const sanitizedContent = computed(() => (props.typewriter ? currentText.value : props.text))
+
+// 修改 scrollStyle 计算属性
+const scrollStyle = computed(() => ({
+  '--animation-duration': `${animationDuration.value}s`,
+  '--animation-play-state': shouldScroll.value ? 'running' : 'paused',
+  '--animation-direction': props.direction === 'left' ? 'normal' : 'reverse',
+}))
+
+// 计算动画持续时间
+function calculateDuration() {
+  if (scrollContent.value) {
+    const contentWidth = scrollContent.value.scrollWidth / 2
+    animationDuration.value = contentWidth / props.speed
+  }
+}
+
+// 处理右图标点击事件
+function handleRightIconClick() {
+  emit('close')
+}
+
+// 修改打字机效果实现
+function startTypewriter() {
+  let index = 0
+  currentText.value = ''
+  isTypewriterComplete.value = false // 重置状态
+
+  const type = () => {
+    if (index < props.text.length) {
+      currentText.value += props.text[index]
+      index++
+      typewriterTimer = setTimeout(type, props.typewriterSpeed)
+    }
+    else {
+      isTypewriterComplete.value = true // 打字完成后设置状态
+    }
+  }
+
+  type()
+}
+
+// 生命周期钩子
+onMounted(() => {
+  calculateDuration()
+  window.addEventListener('resize', calculateDuration)
+
+  if (props.typewriter) {
+    startTypewriter()
+  }
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', calculateDuration)
+  if (typewriterTimer) {
+    clearTimeout(typewriterTimer)
+  }
+})
+
+// 监听文本变化，重新启动打字机效果
+watch(
+  () => props.text,
+  () => {
+    if (props.typewriter) {
+      if (typewriterTimer) {
+        clearTimeout(typewriterTimer)
+      }
+      startTypewriter()
+    }
+  },
+)
+</script>
+
 <template>
   <div ref="containerRef" class="text-scroll-container" :class="[`text-scroll--${props.type}`]">
     <div class="left-icon">
@@ -6,148 +135,20 @@
     </div>
     <div class="scroll-wrapper">
       <div
+        ref="scrollContent"
         class="text-scroll-content"
         :class="{ scrolling: shouldScroll }"
         :style="scrollStyle"
-        ref="scrollContent"
       >
-        <div class="scroll-item" v-html="sanitizedContent"></div>
-        <div class="scroll-item" v-html="sanitizedContent"></div>
+        <div class="scroll-item" v-html="sanitizedContent" />
+        <div class="scroll-item" v-html="sanitizedContent" />
       </div>
     </div>
-    <div class="right-icon" @click="handleRightIconClick" v-if="showClose">
+    <div v-if="showClose" class="right-icon" @click="handleRightIconClick">
       <i class="iconfont-sys">&#xe83a;</i>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-  import { useElementHover } from '@vueuse/core'
-
-  defineOptions({ name: 'ArtTextScroll' })
-
-  const emit = defineEmits(['close'])
-
-  interface Props {
-    /** 文本 */
-    text: string
-    /** 滚动速度 */
-    speed?: number
-    /** 滚动方向 左/右 */
-    direction?: 'left' | 'right'
-    /** 类型 默认/成功/警告/危险/信息 */
-    type?: 'default' | 'success' | 'warning' | 'danger' | 'info'
-    /** 是否显示关闭按钮 */
-    showClose?: boolean
-    /** 是否启用打字机效果 */
-    typewriter?: boolean
-    /** 打字机速度 */
-    typewriterSpeed?: number
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    speed: 70,
-    direction: 'left',
-    type: 'default',
-    showClose: false,
-    typewriter: false,
-    typewriterSpeed: 100
-  })
-
-  // 状态管理
-  const containerRef = ref<HTMLElement | null>(null)
-  const isHovered = useElementHover(containerRef)
-  const scrollContent = ref<HTMLElement | null>(null)
-  const animationDuration = ref(0)
-
-  // 添加打字机效果相关的响应式变量
-  const currentText = ref('')
-  let typewriterTimer: ReturnType<typeof setTimeout> | null = null
-
-  // 添加打字机完成状态
-  const isTypewriterComplete = ref(false)
-
-  // 修改滚动状态计算属性
-  const shouldScroll = computed(() => {
-    if (props.typewriter) {
-      return !isHovered.value && isTypewriterComplete.value
-    }
-    return !isHovered.value
-  })
-
-  // 修改 sanitizedContent 计算属性
-  const sanitizedContent = computed(() => (props.typewriter ? currentText.value : props.text))
-
-  // 修改 scrollStyle 计算属性
-  const scrollStyle = computed(() => ({
-    '--animation-duration': `${animationDuration.value}s`,
-    '--animation-play-state': shouldScroll.value ? 'running' : 'paused',
-    '--animation-direction': props.direction === 'left' ? 'normal' : 'reverse'
-  }))
-
-  // 计算动画持续时间
-  const calculateDuration = () => {
-    if (scrollContent.value) {
-      const contentWidth = scrollContent.value.scrollWidth / 2
-      animationDuration.value = contentWidth / props.speed
-    }
-  }
-
-  // 处理右图标点击事件
-  const handleRightIconClick = () => {
-    emit('close')
-  }
-
-  // 修改打字机效果实现
-  const startTypewriter = () => {
-    let index = 0
-    currentText.value = ''
-    isTypewriterComplete.value = false // 重置状态
-
-    const type = () => {
-      if (index < props.text.length) {
-        currentText.value += props.text[index]
-        index++
-        typewriterTimer = setTimeout(type, props.typewriterSpeed)
-      } else {
-        isTypewriterComplete.value = true // 打字完成后设置状态
-      }
-    }
-
-    type()
-  }
-
-  // 生命周期钩子
-  onMounted(() => {
-    calculateDuration()
-    window.addEventListener('resize', calculateDuration)
-
-    if (props.typewriter) {
-      startTypewriter()
-    }
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('resize', calculateDuration)
-    if (typewriterTimer) {
-      clearTimeout(typewriterTimer)
-    }
-  })
-
-  // 监听文本变化，重新启动打字机效果
-  watch(
-    () => props.text,
-    () => {
-      if (props.typewriter) {
-        if (typewriterTimer) {
-          clearTimeout(typewriterTimer)
-        }
-        startTypewriter()
-      }
-    }
-  )
-</script>
 
 <style scoped lang="scss">
   $text-scroll-height: 34px;

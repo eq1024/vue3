@@ -1,19 +1,83 @@
+<script setup lang="ts">
+import { commentList } from '@/mock/temp/commentList'
+
+defineOptions({ name: 'ArticleComment' })
+
+const showDrawer = ref(false)
+
+// const colorList = reactive([
+//   'rgba(216, 248, 255, 0.8)',
+//   'rgba(253, 223, 217, 0.8)',
+//   'rgba(252, 230, 240, 0.8)',
+//   'rgba(211, 248, 240, 0.8)',
+//   'rgba(255, 234, 188, 0.8)',
+//   'rgba(245, 225, 255, 0.8)',
+//   'rgba(225, 230, 254, 0.8)'
+// ])
+
+const colorList = reactive([
+  '#D8F8FF',
+  '#FDDFD9',
+  '#FCE6F0',
+  '#D3F8F0',
+  '#FFEABC',
+  '#F5E1FF',
+  '#E1E6FE',
+])
+
+let lastColor: string | null = null
+
+function randomColor() {
+  let newColor: string
+
+  do {
+    const index = Math.floor(Math.random() * colorList.length)
+    newColor = colorList[index]
+  } while (newColor === lastColor)
+
+  lastColor = newColor
+  return newColor
+}
+
+const clickItem = ref({
+  id: 1,
+  date: '2024-9-3',
+  content: '加油！学好Node 自己写个小Demo',
+  collection: 5,
+  comment: 8,
+  userName: '匿名',
+})
+
+function openDrawer(item: any) {
+  showDrawer.value = true
+  clickItem.value = item
+}
+</script>
+
 <template>
   <div class="page-content">
-    <h1 class="title">留言墙</h1>
-    <p class="desc">每一份留言都记录了您的想法，也为我们提供了珍贵的回忆</p>
+    <h1 class="title">
+      留言墙
+    </h1>
+    <p class="desc">
+      每一份留言都记录了您的想法，也为我们提供了珍贵的回忆
+    </p>
 
     <div class="list">
       <ul class="offset">
         <li
-          class="comment-box"
           v-for="item in commentList"
           :key="item.id"
+          class="comment-box"
           :style="{ background: randomColor() }"
           @click="openDrawer(item)"
         >
-          <p class="date">{{ item.date }}</p>
-          <p class="content">{{ item.content }}</p>
+          <p class="date">
+            {{ item.date }}
+          </p>
+          <p class="content">
+            {{ item.content }}
+          </p>
           <div class="bottom">
             <div class="left">
               <span><i class="iconfont-sys">&#xe6eb;</i>{{ item.collection }}</span>
@@ -28,8 +92,8 @@
     </div>
 
     <ElDrawer
-      lDrawer
       v-model="showDrawer"
+      l-drawer
       :lock-scroll="false"
       :size="360"
       modal-class="comment-modal"
@@ -40,8 +104,12 @@
       <template #default>
         <div class="drawer-default">
           <div class="comment-box" :style="{ background: randomColor() }">
-            <p class="date">{{ clickItem.date }}</p>
-            <p class="content">{{ clickItem.content }}</p>
+            <p class="date">
+              {{ clickItem.date }}
+            </p>
+            <p class="content">
+              {{ clickItem.content }}
+            </p>
             <div class="bottom">
               <div class="left">
                 <span><i class="iconfont-sys">&#xe6eb;</i>{{ clickItem.collection }}</span>
@@ -66,61 +134,6 @@
     </ElDrawer>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { commentList } from '@/mock/temp/commentList'
-  const showDrawer = ref(false)
-
-  defineOptions({ name: 'ArticleComment' })
-
-  // const colorList = reactive([
-  //   'rgba(216, 248, 255, 0.8)',
-  //   'rgba(253, 223, 217, 0.8)',
-  //   'rgba(252, 230, 240, 0.8)',
-  //   'rgba(211, 248, 240, 0.8)',
-  //   'rgba(255, 234, 188, 0.8)',
-  //   'rgba(245, 225, 255, 0.8)',
-  //   'rgba(225, 230, 254, 0.8)'
-  // ])
-
-  const colorList = reactive([
-    '#D8F8FF',
-    '#FDDFD9',
-    '#FCE6F0',
-    '#D3F8F0',
-    '#FFEABC',
-    '#F5E1FF',
-    '#E1E6FE'
-  ])
-
-  let lastColor: string | null = null
-
-  const randomColor = () => {
-    let newColor: string
-
-    do {
-      const index = Math.floor(Math.random() * colorList.length)
-      newColor = colorList[index]
-    } while (newColor === lastColor)
-
-    lastColor = newColor
-    return newColor
-  }
-
-  const clickItem = ref({
-    id: 1,
-    date: '2024-9-3',
-    content: '加油！学好Node 自己写个小Demo',
-    collection: 5,
-    comment: 8,
-    userName: '匿名'
-  })
-
-  const openDrawer = (item: any) => {
-    showDrawer.value = true
-    clickItem.value = item
-  }
-</script>
 
 <style lang="scss" scoped>
   .page-content {

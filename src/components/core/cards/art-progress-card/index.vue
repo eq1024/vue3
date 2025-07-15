@@ -1,4 +1,70 @@
 <!-- 进度条卡片 -->
+<script setup lang="ts">
+defineOptions({ name: 'ArtProgressCard' })
+
+const props = withDefaults(defineProps<Props>(), {
+  strokeWidth: 5,
+  iconBgRadius: 8,
+  color: '#67C23A',
+})
+
+interface Props {
+  /** 进度百分比 */
+  percentage: number
+  /** 标题 */
+  title: string
+  /** 颜色 */
+  color?: string
+  /** 图标 */
+  icon?: string
+  /** 图标颜色 */
+  iconColor?: string
+  /** 图标背景颜色 */
+  iconBgColor?: string
+  /** icon 背景圆角大小 */
+  iconBgRadius?: number
+  /** 图标大小 */
+  iconSize?: number
+  /** 进度条宽度 */
+  strokeWidth?: number
+}
+
+const animationDuration = 500
+const currentPercentage = ref(0)
+
+function animateProgress() {
+  const startTime = Date.now()
+  const startValue = currentPercentage.value
+  const endValue = props.percentage
+
+  const animate = () => {
+    const currentTime = Date.now()
+    const elapsed = currentTime - startTime
+    const progress = Math.min(elapsed / animationDuration, 1)
+
+    currentPercentage.value = startValue + (endValue - startValue) * progress
+
+    if (progress < 1) {
+      requestAnimationFrame(animate)
+    }
+  }
+
+  requestAnimationFrame(animate)
+}
+
+onMounted(() => {
+  animateProgress()
+})
+
+// 当 percentage 属性变化时重新执行动画
+watch(
+  () => props.percentage,
+  () => {
+    animateProgress()
+  },
+)
+</script>
+
 <template>
   <div class="progress-card art-custom-card">
     <div class="progress-info" :style="{ justifyContent: icon ? 'space-between' : 'flex-start' }">
@@ -6,14 +72,14 @@
         <i
           v-if="icon"
           class="iconfont-sys"
-          v-html="icon"
           :style="{
             color: iconColor,
             backgroundColor: iconBgColor,
-            fontSize: iconSize + 'px',
-            borderRadius: iconBgRadius + 'px'
+            fontSize: `${iconSize}px`,
+            borderRadius: `${iconBgRadius}px`,
           }"
-        ></i>
+          v-html="icon"
+        />
       </div>
       <div class="right">
         <ArtCountTo
@@ -23,7 +89,9 @@
           suffix="%"
           :style="{ textAlign: icon ? 'right' : 'left' }"
         />
-        <p class="title">{{ title }}</p>
+        <p class="title">
+          {{ title }}
+        </p>
       </div>
     </div>
     <ElProgress
@@ -34,72 +102,6 @@
     />
   </div>
 </template>
-
-<script setup lang="ts">
-  defineOptions({ name: 'ArtProgressCard' })
-
-  interface Props {
-    /** 进度百分比 */
-    percentage: number
-    /** 标题 */
-    title: string
-    /** 颜色 */
-    color?: string
-    /** 图标 */
-    icon?: string
-    /** 图标颜色 */
-    iconColor?: string
-    /** 图标背景颜色 */
-    iconBgColor?: string
-    /** icon 背景圆角大小 */
-    iconBgRadius?: number
-    /** 图标大小 */
-    iconSize?: number
-    /** 进度条宽度 */
-    strokeWidth?: number
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    strokeWidth: 5,
-    iconBgRadius: 8,
-    color: '#67C23A'
-  })
-
-  const animationDuration = 500
-  const currentPercentage = ref(0)
-
-  const animateProgress = () => {
-    const startTime = Date.now()
-    const startValue = currentPercentage.value
-    const endValue = props.percentage
-
-    const animate = () => {
-      const currentTime = Date.now()
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / animationDuration, 1)
-
-      currentPercentage.value = startValue + (endValue - startValue) * progress
-
-      if (progress < 1) {
-        requestAnimationFrame(animate)
-      }
-    }
-
-    requestAnimationFrame(animate)
-  }
-
-  onMounted(() => {
-    animateProgress()
-  })
-
-  // 当 percentage 属性变化时重新执行动画
-  watch(
-    () => props.percentage,
-    () => {
-      animateProgress()
-    }
-  )
-</script>
 
 <style lang="scss" scoped>
   .progress-card {

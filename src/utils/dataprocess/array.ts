@@ -9,22 +9,24 @@ export function noRepeat<T>(arr: T[]): T[] {
 
 // 查找数组最大值
 export function arrayMax(arr: number[]): number {
-  if (!arr.length) throw new Error('Array is empty')
+  if (!arr.length)
+    throw new Error('Array is empty')
   return Math.max(...arr)
 }
 
 // 查找数组最小值
 export function arrayMin(arr: number[]): number {
-  if (!arr.length) throw new Error('Array is empty')
+  if (!arr.length)
+    throw new Error('Array is empty')
   return Math.min(...arr)
 }
 
 // 数组分割
 export function chunk<T>(arr: T[], size: number = 1): T[][] {
-  if (size <= 0) return [arr.slice()]
+  if (size <= 0)
+    return [arr.slice()]
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size)
-  )
+    arr.slice(i * size, i * size + size))
 }
 
 // 检查元素出现次数
@@ -40,13 +42,13 @@ export function flatten<T>(arr: any[], depth: number = Infinity): T[] {
 // 返回两个数组的差集
 export function difference<T>(arrA: T[], arrB: T[]): T[] {
   const setB = new Set(arrB)
-  return arrA.filter((item) => !setB.has(item))
+  return arrA.filter(item => !setB.has(item))
 }
 
 // 返回两个数组的交集
 export function intersection<T>(arr1: T[], arr2: T[]): T[] {
   const set2 = new Set(arr2)
-  return arr1.filter((item) => set2.has(item))
+  return arr1.filter(item => set2.has(item))
 }
 
 // 从右删除 n 个元素
@@ -56,7 +58,8 @@ export function dropRight<T>(arr: T[], n: number = 0): T[] {
 
 // 返回间隔 nth 的元素
 export function everyNth<T>(arr: T[], nth: number): T[] {
-  if (nth <= 0) return []
+  if (nth <= 0)
+    return []
   return arr.filter((_, i) => i % nth === nth - 1)
 }
 

@@ -8,15 +8,15 @@ export function currentURL(): string {
 }
 
 // 获取滚动条位置
-export function getScrollPosition(el: HTMLElement | Window = window): { x: number; y: number } {
+export function getScrollPosition(el: HTMLElement | Window = window): { x: number, y: number } {
   return el === window
     ? {
         x: window.scrollX || document.documentElement.scrollLeft,
-        y: window.scrollY || document.documentElement.scrollTop
+        y: window.scrollY || document.documentElement.scrollTop,
       }
     : {
         x: (el as HTMLElement).scrollLeft,
-        y: (el as HTMLElement).scrollTop
+        y: (el as HTMLElement).scrollTop,
       }
 }
 
@@ -30,7 +30,8 @@ export function copy(str: string): boolean {
   try {
     navigator.clipboard.writeText(str)
     return true
-  } catch (err) {
+  }
+  catch (err) {
     console.error('Copy failed:', err)
     return false
   }

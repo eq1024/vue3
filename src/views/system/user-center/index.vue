@@ -1,12 +1,115 @@
+<script setup lang="ts">
+import type { FormInstance, FormRules } from 'element-plus'
+import { ElForm } from 'element-plus'
+import { useUserStore } from '@/store/modules/user'
+
+defineOptions({ name: 'UserCenter' })
+
+const userStore = useUserStore()
+const userInfo = computed(() => userStore.getUserInfo)
+
+const isEdit = ref(false)
+const isEditPwd = ref(false)
+const date = ref('')
+const form = reactive({
+  realName: 'John Snow',
+  nikeName: '皮卡丘',
+  email: '59301283@mall.com',
+  mobile: '18888888888',
+  address: '广东省深圳市宝安区西乡街道101栋201',
+  sex: '2',
+  des: 'Art Design Pro 是一款漂亮的后台管理系统模版.',
+})
+
+const pwdForm = reactive({
+  password: '123456',
+  newPassword: '123456',
+  confirmPassword: '123456',
+})
+
+const ruleFormRef = ref<FormInstance>()
+
+const rules = reactive<FormRules>({
+  realName: [
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 30 个字符', trigger: 'blur' },
+  ],
+  nikeName: [
+    { required: true, message: '请输入昵称', trigger: 'blur' },
+    { min: 2, max: 50, message: '长度在 2 到 30 个字符', trigger: 'blur' },
+  ],
+  email: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
+  mobile: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
+  address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
+  sex: [{ type: 'array', required: true, message: '请选择性别', trigger: 'blur' }],
+})
+
+const options = [
+  {
+    value: '1',
+    label: '男',
+  },
+  {
+    value: '2',
+    label: '女',
+  },
+]
+
+const lableList: Array<string> = ['专注设计', '很有想法', '辣~', '大长腿', '川妹子', '海纳百川']
+
+onMounted(() => {
+  getDate()
+})
+
+function getDate() {
+  const d = new Date()
+  const h = d.getHours()
+  let text = ''
+
+  if (h >= 6 && h < 9) {
+    text = '早上好'
+  }
+  else if (h >= 9 && h < 11) {
+    text = '上午好'
+  }
+  else if (h >= 11 && h < 13) {
+    text = '中午好'
+  }
+  else if (h >= 13 && h < 18) {
+    text = '下午好'
+  }
+  else if (h >= 18 && h < 24) {
+    text = '晚上好'
+  }
+  else if (h >= 0 && h < 6) {
+    text = '很晚了，早点睡'
+  }
+
+  date.value = text
+}
+
+function edit() {
+  isEdit.value = !isEdit.value
+}
+
+function editPwd() {
+  isEditPwd.value = !isEditPwd.value
+}
+</script>
+
 <template>
   <div class="page-content user">
     <div class="content">
       <div class="left-wrap">
         <div class="user-wrap box-style">
-          <img class="bg" src="@imgs/user/bg.webp" />
-          <img class="avatar" src="@imgs/user/avatar.webp" />
-          <h2 class="name">{{ userInfo.userName }}</h2>
-          <p class="des">Art Design Pro 是一款漂亮的后台管理系统模版.</p>
+          <img class="bg" src="@imgs/user/bg.webp">
+          <img class="avatar" src="@imgs/user/avatar.webp">
+          <h2 class="name">
+            {{ userInfo.userName }}
+          </h2>
+          <p class="des">
+            Art Design Pro 是一款漂亮的后台管理系统模版.
+          </p>
 
           <div class="outer-info">
             <div>
@@ -48,12 +151,14 @@
       </div>
       <div class="right-wrap">
         <div class="info box-style">
-          <h1 class="title">基本设置</h1>
+          <h1 class="title">
+            基本设置
+          </h1>
 
           <ElForm
+            ref="ruleFormRef"
             :model="form"
             class="form"
-            ref="ruleFormRef"
             :rules="rules"
             label-width="86px"
             label-position="top"
@@ -93,11 +198,11 @@
             </ElRow>
 
             <ElFormItem label="个人介绍" prop="des" :style="{ height: '130px' }">
-              <ElInput type="textarea" :rows="4" v-model="form.des" :disabled="!isEdit" />
+              <ElInput v-model="form.des" type="textarea" :rows="4" :disabled="!isEdit" />
             </ElFormItem>
 
             <div class="el-form-item-right">
-              <ElButton type="primary" style="width: 90px" v-ripple @click="edit">
+              <ElButton v-ripple type="primary" style="width: 90px" @click="edit">
                 {{ isEdit ? '保存' : '编辑' }}
               </ElButton>
             </div>
@@ -105,7 +210,9 @@
         </div>
 
         <div class="info box-style" style="margin-top: 20px">
-          <h1 class="title">更改密码</h1>
+          <h1 class="title">
+            更改密码
+          </h1>
 
           <ElForm :model="pwdForm" class="form" label-width="86px" label-position="top">
             <ElFormItem label="当前密码" prop="password">
@@ -136,7 +243,7 @@
             </ElFormItem>
 
             <div class="el-form-item-right">
-              <ElButton type="primary" style="width: 90px" v-ripple @click="editPwd">
+              <ElButton v-ripple type="primary" style="width: 90px" @click="editPwd">
                 {{ isEditPwd ? '保存' : '编辑' }}
               </ElButton>
             </div>
@@ -146,99 +253,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useUserStore } from '@/store/modules/user'
-  import { ElForm, FormInstance, FormRules } from 'element-plus'
-
-  defineOptions({ name: 'UserCenter' })
-
-  const userStore = useUserStore()
-  const userInfo = computed(() => userStore.getUserInfo)
-
-  const isEdit = ref(false)
-  const isEditPwd = ref(false)
-  const date = ref('')
-  const form = reactive({
-    realName: 'John Snow',
-    nikeName: '皮卡丘',
-    email: '59301283@mall.com',
-    mobile: '18888888888',
-    address: '广东省深圳市宝安区西乡街道101栋201',
-    sex: '2',
-    des: 'Art Design Pro 是一款漂亮的后台管理系统模版.'
-  })
-
-  const pwdForm = reactive({
-    password: '123456',
-    newPassword: '123456',
-    confirmPassword: '123456'
-  })
-
-  const ruleFormRef = ref<FormInstance>()
-
-  const rules = reactive<FormRules>({
-    realName: [
-      { required: true, message: '请输入昵称', trigger: 'blur' },
-      { min: 2, max: 50, message: '长度在 2 到 30 个字符', trigger: 'blur' }
-    ],
-    nikeName: [
-      { required: true, message: '请输入昵称', trigger: 'blur' },
-      { min: 2, max: 50, message: '长度在 2 到 30 个字符', trigger: 'blur' }
-    ],
-    email: [{ required: true, message: '请输入昵称', trigger: 'blur' }],
-    mobile: [{ required: true, message: '请输入手机号码', trigger: 'blur' }],
-    address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
-    sex: [{ type: 'array', required: true, message: '请选择性别', trigger: 'blur' }]
-  })
-
-  const options = [
-    {
-      value: '1',
-      label: '男'
-    },
-    {
-      value: '2',
-      label: '女'
-    }
-  ]
-
-  const lableList: Array<string> = ['专注设计', '很有想法', '辣~', '大长腿', '川妹子', '海纳百川']
-
-  onMounted(() => {
-    getDate()
-  })
-
-  const getDate = () => {
-    const d = new Date()
-    const h = d.getHours()
-    let text = ''
-
-    if (h >= 6 && h < 9) {
-      text = '早上好'
-    } else if (h >= 9 && h < 11) {
-      text = '上午好'
-    } else if (h >= 11 && h < 13) {
-      text = '中午好'
-    } else if (h >= 13 && h < 18) {
-      text = '下午好'
-    } else if (h >= 18 && h < 24) {
-      text = '晚上好'
-    } else if (h >= 0 && h < 6) {
-      text = '很晚了，早点睡'
-    }
-
-    date.value = text
-  }
-
-  const edit = () => {
-    isEdit.value = !isEdit.value
-  }
-
-  const editPwd = () => {
-    isEditPwd.value = !isEditPwd.value
-  }
-</script>
 
 <style lang="scss">
   .user {

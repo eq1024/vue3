@@ -1,24 +1,56 @@
+<script setup lang="ts">
+const weeklyList = [
+  {
+    icon: '&#xe718;',
+    title: '智能手表Pro',
+    subtitle: '电子产品',
+    value: '1,286件',
+    color: 'bg-primary',
+  },
+  {
+    icon: '&#xe70c;',
+    title: '时尚连衣裙',
+    subtitle: '女装服饰',
+    value: '892件',
+    color: 'bg-success',
+  },
+  {
+    icon: '&#xe813;',
+    title: '厨房小家电',
+    subtitle: '家居用品',
+    value: '756件',
+    color: 'bg-error',
+  },
+]
+</script>
+
 <template>
   <div class="card art-custom-card weekly-card" style="height: 28.2rem">
     <div class="card-header">
-      <p class="title">热销商品</p>
-      <p class="subtitle">本周销售排行</p>
+      <p class="title">
+        热销商品
+      </p>
+      <p class="subtitle">
+        本周销售排行
+      </p>
     </div>
     <ArtLineChart
-      :showAxisLabel="false"
-      :showAxisLine="false"
-      :showSplitLine="false"
-      :showAreaColor="true"
+      :show-axis-label="false"
+      :show-axis-line="false"
+      :show-split-line="false"
+      :show-area-color="true"
       :data="[8, 40, 82, 35, 90, 52, 35]"
       height="9rem"
     />
     <div class="content">
-      <div class="item" v-for="item in weeklyList" :key="item.title">
+      <div v-for="item in weeklyList" :key="item.title" class="item">
         <div class="icon" :class="item.color">
           <i class="iconfont-sys">&#xe718;</i>
         </div>
         <div class="text">
-          <p class="title">{{ item.title }}</p>
+          <p class="title">
+            {{ item.title }}
+          </p>
           <span class="subtitle">{{ item.subtitle }}</span>
         </div>
         <div class="value" :class="item.color">
@@ -28,32 +60,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  const weeklyList = [
-    {
-      icon: '&#xe718;',
-      title: '智能手表Pro',
-      subtitle: '电子产品',
-      value: '1,286件',
-      color: 'bg-primary'
-    },
-    {
-      icon: '&#xe70c;',
-      title: '时尚连衣裙',
-      subtitle: '女装服饰',
-      value: '892件',
-      color: 'bg-success'
-    },
-    {
-      icon: '&#xe813;',
-      title: '厨房小家电',
-      subtitle: '家居用品',
-      value: '756件',
-      color: 'bg-error'
-    }
-  ]
-</script>
 
 <style lang="scss" scoped>
   .weekly-card {

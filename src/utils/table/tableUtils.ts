@@ -17,7 +17,7 @@ export interface TableError {
 /**
  * 默认响应适配器 - 支持多种常见的API响应格式
  */
-export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => {
+export function defaultResponseAdapter<T>(response: unknown): ApiResponse<T> {
   // 处理空响应
   if (!response) {
     return { records: [], total: 0, current: 1, size: 10 }
@@ -29,7 +29,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
       records: response,
       total: response.length,
       current: 1,
-      size: response.length
+      size: response.length,
     }
   }
 
@@ -43,7 +43,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
         records: (res.records || res.data || []) as T[],
         total: (res.total || res.count || 0) as number,
         current: (res.current || res.page || res.pageNum || 1) as number,
-        size: (res.size || res.pageSize || res.limit || 10) as number
+        size: (res.size || res.pageSize || res.limit || 10) as number,
       }
     }
 
@@ -56,18 +56,18 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
         return {
           records: (data.list || data.records || data.items || []) as T[],
           total: (data.total || data.count || 0) as number,
-          current: (data.current ||
-            data.page ||
-            data.pageNum ||
-            res.current ||
-            res.page ||
-            1) as number,
-          size: (data.size ||
-            data.pageSize ||
-            data.limit ||
-            res.size ||
-            res.pageSize ||
-            10) as number
+          current: (data.current
+            || data.page
+            || data.pageNum
+            || res.current
+            || res.page
+            || 1) as number,
+          size: (data.size
+            || data.pageSize
+            || data.limit
+            || res.size
+            || res.pageSize
+            || 10) as number,
         }
       }
 
@@ -77,7 +77,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
           records: data as T[],
           total: data.length,
           current: 1,
-          size: data.length
+          size: data.length,
         }
       }
     }
@@ -89,7 +89,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
         records,
         total: (res.total || res.count || records.length) as number,
         current: (res.current || res.page || res.pageNum || 1) as number,
-        size: (res.size || res.pageSize || res.limit || 10) as number
+        size: (res.size || res.pageSize || res.limit || 10) as number,
       }
     }
 
@@ -102,7 +102,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
           records,
           total: (res.total || res.count || records.length) as number,
           current: (res.current || res.page || 1) as number,
-          size: (res.size || res.pageSize || 10) as number
+          size: (res.size || res.pageSize || 10) as number,
         }
       }
     }
@@ -116,7 +116,7 @@ export const defaultResponseAdapter = <T>(response: unknown): ApiResponse<T> => 
 /**
  * 从标准化的API响应中提取表格数据
  */
-export const extractTableData = <T>(response: ApiResponse<T>): T[] => {
+export function extractTableData<T>(response: ApiResponse<T>): T[] {
   // 优先使用 records，然后是 data
   const data = response.records || response.data || []
 
@@ -132,10 +132,7 @@ export const extractTableData = <T>(response: ApiResponse<T>): T[] => {
 /**
  * 根据API响应更新分页信息
  */
-export const updatePaginationFromResponse = <T>(
-  pagination: Api.Common.PaginatingParams,
-  response: ApiResponse<T>
-): void => {
+export function updatePaginationFromResponse<T>(pagination: Api.Common.PaginatingParams, response: ApiResponse<T>): void {
   // 使用响应中的分页信息，如果没有则保持当前值
   pagination.total = response.total ?? pagination.total ?? 0
   pagination.current = response.current ?? pagination.current ?? 1
@@ -151,10 +148,7 @@ export const updatePaginationFromResponse = <T>(
 /**
  * 创建智能防抖函数 - 支持取消和立即执行
  */
-export const createSmartDebounce = <T extends (...args: any[]) => Promise<any>>(
-  fn: T,
-  delay: number
-): T & { cancel: () => void; flush: () => Promise<any> } => {
+export function createSmartDebounce<T extends (...args: any[]) => Promise<any>>(fn: T, delay: number): T & { cancel: () => void, flush: () => Promise<any> } {
   let timeoutId: NodeJS.Timeout | null = null
   let lastArgs: Parameters<T> | null = null
   let lastResolve: ((value: any) => void) | null = null
@@ -177,9 +171,11 @@ export const createSmartDebounce = <T extends (...args: any[]) => Promise<any>>(
         try {
           const result = await fn(...args)
           resolve(result)
-        } catch (error) {
+        }
+        catch (error) {
           reject(error)
-        } finally {
+        }
+        finally {
           timeoutId = null
           lastArgs = null
           lastResolve = null
@@ -218,7 +214,8 @@ export const createSmartDebounce = <T extends (...args: any[]) => Promise<any>>(
         const result = await fn(...args)
         resolve(result)
         return result
-      } catch (error) {
+      }
+      catch (error) {
         reject(error)
         throw error
       }
@@ -227,35 +224,33 @@ export const createSmartDebounce = <T extends (...args: any[]) => Promise<any>>(
     return Promise.resolve()
   }
 
-  return debouncedFn as T & { cancel: () => void; flush: () => Promise<any> }
+  return debouncedFn as T & { cancel: () => void, flush: () => Promise<any> }
 }
 
 /**
  * 生成错误处理函数
  */
-export const createErrorHandler = (
-  onError?: (error: TableError) => void,
-  enableLog: boolean = false
-) => {
+export function createErrorHandler(onError?: (error: TableError) => void, enableLog: boolean = false) {
   const logger = {
     error: (message: string, ...args: any[]) => {
       if (enableLog) {
         console.error(`[useTable] ${message}`, ...args)
       }
-    }
+    },
   }
 
   return (err: unknown, context: string): TableError => {
     const tableError: TableError = {
       code: 'UNKNOWN_ERROR',
       message: '未知错误',
-      details: err
+      details: err,
     }
 
     if (err instanceof Error) {
       tableError.message = err.message
       tableError.code = err.name
-    } else if (typeof err === 'string') {
+    }
+    else if (typeof err === 'string') {
       tableError.message = err
     }
 

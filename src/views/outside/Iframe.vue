@@ -1,35 +1,35 @@
+<script setup lang="ts">
+import { getIframeRoutes } from '@/router/utils/menuToRouter'
+
+const route = useRoute()
+const isLoading = ref(true)
+const iframeUrl = ref('')
+const iframeRef = ref<HTMLIFrameElement | null>(null)
+
+onMounted(() => {
+  const iframeRoute = getIframeRoutes().find((item: any) => item.path === route.path)
+
+  if (iframeRoute?.meta) {
+    iframeUrl.value = iframeRoute.meta.link || ''
+  }
+})
+
+function handleIframeLoad() {
+  isLoading.value = false
+}
+</script>
+
 <template>
-  <div class="iframe-container" v-loading="isLoading">
+  <div v-loading="isLoading" class="iframe-container">
     <iframe
       ref="iframeRef"
       :src="iframeUrl"
       frameborder="0"
       class="iframe-content"
       @load="handleIframeLoad"
-    ></iframe>
+    />
   </div>
 </template>
-
-<script setup lang="ts">
-  import { getIframeRoutes } from '@/router/utils/menuToRouter'
-
-  const route = useRoute()
-  const isLoading = ref(true)
-  const iframeUrl = ref('')
-  const iframeRef = ref<HTMLIFrameElement | null>(null)
-
-  onMounted(() => {
-    const iframeRoute = getIframeRoutes().find((item: any) => item.path === route.path)
-
-    if (iframeRoute?.meta) {
-      iframeUrl.value = iframeRoute.meta.link || ''
-    }
-  })
-
-  const handleIframeLoad = () => {
-    isLoading.value = false
-  }
-</script>
 
 <style scoped>
   .iframe-container {

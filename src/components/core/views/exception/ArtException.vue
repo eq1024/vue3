@@ -1,42 +1,44 @@
+<script setup lang="ts">
+import { useCommon } from '@/composables/useCommon'
+
+withDefaults(
+  defineProps<{
+    data: ExceptionData
+  }>(),
+  {},
+)
+
+const router = useRouter()
+
+interface ExceptionData {
+  /** 标题 */
+  title: string
+  /** 描述 */
+  desc: string
+  /** 按钮文本 */
+  btnText: string
+  /** 图片地址 */
+  imgUrl: string
+}
+
+function backHome() {
+  router.push(useCommon().homePath.value)
+}
+</script>
+
 <template>
   <div class="page-content state-page">
     <div class="tips">
-      <img :src="data.imgUrl" />
+      <img :src="data.imgUrl">
       <div class="right-wrap">
         <p>{{ data.desc }}</p>
-        <el-button color="#47A7FF" @click="backHome" v-ripple>{{ data.btnText }}</el-button>
+        <el-button v-ripple color="#47A7FF" @click="backHome">
+          {{ data.btnText }}
+        </el-button>
       </div>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { useCommon } from '@/composables/useCommon'
-
-  const router = useRouter()
-
-  interface ExceptionData {
-    /** 标题 */
-    title: string
-    /** 描述 */
-    desc: string
-    /** 按钮文本 */
-    btnText: string
-    /** 图片地址 */
-    imgUrl: string
-  }
-
-  withDefaults(
-    defineProps<{
-      data: ExceptionData
-    }>(),
-    {}
-  )
-
-  const backHome = () => {
-    router.push(useCommon().homePath.value)
-  }
-</script>
 
 <style lang="scss" scoped>
   .state-page {

@@ -1,75 +1,85 @@
 <!-- 数据列表卡片 -->
+<script setup lang="ts">
+defineOptions({ name: 'ArtDataListCard' })
+
+const props = withDefaults(defineProps<Props>(), {
+  maxCount: DEFAULT_MAX_COUNT,
+})
+
+const emit = defineEmits<{
+  /** 点击更多按钮事件 */
+  (e: 'more'): void
+}>()
+
+interface Props {
+  /** 数据列表 */
+  list: Activity[]
+  /** 标题 */
+  title: string
+  /** 副标题 */
+  subtitle?: string
+  /** 最大显示数量 */
+  maxCount?: number
+  /** 是否显示更多按钮 */
+  showMoreButton?: boolean
+}
+
+interface Activity {
+  /** 标题 */
+  title: string
+  /** 状态 */
+  status: string
+  /** 时间 */
+  time: string
+  /** 样式类名 */
+  class: string
+  /** 图标 */
+  icon: string
+}
+
+const ITEM_HEIGHT = 66
+const DEFAULT_MAX_COUNT = 5
+
+const maxHeight = computed(() => `${ITEM_HEIGHT * props.maxCount}px`)
+
+const handleMore = () => emit('more')
+</script>
+
 <template>
   <div class="basic-list-card">
     <div class="art-card art-custom-card">
       <div class="card-header">
-        <p class="card-title">{{ title }}</p>
-        <p class="card-subtitle">{{ subtitle }}</p>
+        <p class="card-title">
+          {{ title }}
+        </p>
+        <p class="card-subtitle">
+          {{ subtitle }}
+        </p>
       </div>
       <ElScrollbar :style="{ height: maxHeight }">
         <div v-for="(item, index) in list" :key="index" class="list-item">
-          <div class="item-icon" :class="item.class" v-if="item.icon">
-            <i class="iconfont-sys" v-html="item.icon"></i>
+          <div v-if="item.icon" class="item-icon" :class="item.class">
+            <i class="iconfont-sys" v-html="item.icon" />
           </div>
           <div class="item-content">
-            <div class="item-title">{{ item.title }}</div>
-            <div class="item-status">{{ item.status }}</div>
+            <div class="item-title">
+              {{ item.title }}
+            </div>
+            <div class="item-status">
+              {{ item.status }}
+            </div>
           </div>
-          <div class="item-time">{{ item.time }}</div>
+          <div class="item-time">
+            {{ item.time }}
+          </div>
         </div>
       </ElScrollbar>
-      <ElButton class="more-btn" v-if="showMoreButton" v-ripple @click="handleMore"
-        >查看更多</ElButton
-      >
+      <ElButton v-if="showMoreButton" v-ripple class="more-btn" @click="handleMore">
+        查看更多
+      </ElButton>
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  defineOptions({ name: 'ArtDataListCard' })
-
-  interface Props {
-    /** 数据列表 */
-    list: Activity[]
-    /** 标题 */
-    title: string
-    /** 副标题 */
-    subtitle?: string
-    /** 最大显示数量 */
-    maxCount?: number
-    /** 是否显示更多按钮 */
-    showMoreButton?: boolean
-  }
-
-  interface Activity {
-    /** 标题 */
-    title: string
-    /** 状态 */
-    status: string
-    /** 时间 */
-    time: string
-    /** 样式类名 */
-    class: string
-    /** 图标 */
-    icon: string
-  }
-
-  const ITEM_HEIGHT = 66
-  const DEFAULT_MAX_COUNT = 5
-
-  const props = withDefaults(defineProps<Props>(), {
-    maxCount: DEFAULT_MAX_COUNT
-  })
-
-  const maxHeight = computed(() => `${ITEM_HEIGHT * props.maxCount}px`)
-
-  const emit = defineEmits<{
-    /** 点击更多按钮事件 */
-    (e: 'more'): void
-  }>()
-
-  const handleMore = () => emit('more')
-</script>
 
 <style lang="scss" scoped>
   .basic-list-card {

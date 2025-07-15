@@ -1,19 +1,81 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import AppConfig from '@/config'
+
+interface Comment {
+  id: number
+  author: string
+  content: string
+  timestamp: string
+  replies: Comment[]
+}
+
+const props = defineProps<{
+  comment: Comment
+  showReplyForm: number | null
+}>()
+
+const emit = defineEmits<{
+  (event: 'toggle-reply', commentId: number): void
+  (event: 'add-reply', commentId: number, replyAuthor: string, replyContent: string): void
+}>()
+
+const replyAuthor = ref('')
+const replyContent = ref('')
+
+function toggleReply(commentId: number) {
+  emit('toggle-reply', commentId)
+}
+
+function addReply(commentId: number, author: string, content: string) {
+  emit('add-reply', commentId, author, content)
+  replyAuthor.value = ''
+  replyContent.value = ''
+}
+function handleSubmit() {
+  emit('add-reply', props.comment.id, replyAuthor.value, replyContent.value)
+}
+
+function formatDate(timestamp: string) {
+  const date = new Date(timestamp)
+  return date.toLocaleString()
+}
+
+let lastColor: string | null = null
+
+function randomColor() {
+  let newColor: string
+
+  do {
+    const index = Math.floor(Math.random() * AppConfig.systemMainColor.length)
+    newColor = AppConfig.systemMainColor[index]
+  } while (newColor === lastColor)
+
+  lastColor = newColor
+  return newColor
+}
+</script>
+
 <template>
   <li class="comment-item">
     <div class="comment-main">
       <div class="comment-header">
-        <div class="avatar" :style="{ background: randomColor() }">{{
-          comment.author.substring(0, 1)
-        }}</div>
+        <div class="avatar" :style="{ background: randomColor() }">
+          {{
+            comment.author.substring(0, 1)
+          }}
+        </div>
         <strong class="name dark-text">{{ comment.author }}</strong>
       </div>
       <span class="content">{{ comment.content }}</span>
       <div class="comment-info">
         <span class="date">{{ formatDate(comment.timestamp) }}</span>
-        <div class="btn-text" @click="toggleReply(comment.id)">回复</div>
+        <div class="btn-text" @click="toggleReply(comment.id)">
+          回复
+        </div>
       </div>
     </div>
-    <ul class="comment-replies" v-if="comment.replies.length > 0">
+    <ul v-if="comment.replies.length > 0" class="comment-replies">
       <CommentItem
         v-for="reply in comment.replies"
         :key="reply.id"
@@ -26,71 +88,15 @@
 
     <form v-if="showReplyForm === comment.id" @submit="handleSubmit">
       <div>
-        <input v-model="replyAuthor" placeholder="你的名称" required />
-        <textarea v-model="replyContent" placeholder="你的回复" required></textarea>
-        <button class="btn" type="submit">发布</button>
+        <input v-model="replyAuthor" placeholder="你的名称" required>
+        <textarea v-model="replyContent" placeholder="你的回复" required />
+        <button class="btn" type="submit">
+          发布
+        </button>
       </div>
     </form>
   </li>
 </template>
-
-<script setup lang="ts">
-  import AppConfig from '@/config'
-  import { ref } from 'vue'
-
-  interface Comment {
-    id: number
-    author: string
-    content: string
-    timestamp: string
-    replies: Comment[]
-  }
-
-  const props = defineProps<{
-    comment: Comment
-    showReplyForm: number | null
-  }>()
-
-  const emit = defineEmits<{
-    (event: 'toggle-reply', commentId: number): void
-    (event: 'add-reply', commentId: number, replyAuthor: string, replyContent: string): void
-  }>()
-
-  const replyAuthor = ref('')
-  const replyContent = ref('')
-
-  const toggleReply = (commentId: number) => {
-    emit('toggle-reply', commentId)
-  }
-
-  const addReply = (commentId: number, author: string, content: string) => {
-    emit('add-reply', commentId, author, content)
-    replyAuthor.value = ''
-    replyContent.value = ''
-  }
-  const handleSubmit = () => {
-    emit('add-reply', props.comment.id, replyAuthor.value, replyContent.value)
-  }
-
-  const formatDate = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return date.toLocaleString()
-  }
-
-  let lastColor: string | null = null
-
-  const randomColor = () => {
-    let newColor: string
-
-    do {
-      const index = Math.floor(Math.random() * AppConfig.systemMainColor.length)
-      newColor = AppConfig.systemMainColor[index]
-    } while (newColor === lastColor)
-
-    lastColor = newColor
-    return newColor
-  }
-</script>
 
 <style scoped lang="scss">
   .comment-module {

@@ -78,7 +78,7 @@ onMounted(() => {
 function addAnimation() {
   setTimeout(() => {
     for (let i = 0; i < tableData.length; i++) {
-      let item = tableData[i]
+      const item = tableData[i]
       tableData[i].pro = item.percentage
     }
   }, 100)

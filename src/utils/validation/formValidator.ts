@@ -9,7 +9,7 @@
 export enum PasswordStrength {
   WEAK = '弱',
   MEDIUM = '中',
-  STRONG = '强'
+  STRONG = '强',
 }
 
 /**
@@ -66,7 +66,7 @@ export function validateAccount(value: string): boolean {
   }
 
   // 字母开头，5-20位，支持字母、数字、下划线
-  const accountRegex = /^[a-zA-Z][a-zA-Z0-9_]{4,19}$/
+  const accountRegex = /^[a-z]\w{4,19}$/i
   return accountRegex.test(value.trim())
 }
 
@@ -89,7 +89,7 @@ export function validatePassword(value: string): boolean {
   }
 
   // 必须包含字母和数字
-  const hasLetter = /[a-zA-Z]/.test(trimmedValue)
+  const hasLetter = /[a-z]/i.test(trimmedValue)
   const hasNumber = /\d/.test(trimmedValue)
 
   return hasLetter && hasNumber
@@ -148,9 +148,11 @@ export function getPasswordStrength(value: string): PasswordStrength {
 
   if (typeCount >= 3) {
     return PasswordStrength.STRONG
-  } else if (typeCount >= 2) {
+  }
+  else if (typeCount >= 2) {
     return PasswordStrength.MEDIUM
-  } else {
+  }
+  else {
     return PasswordStrength.WEAK
   }
 }
@@ -175,7 +177,7 @@ export function validateIPv4Address(value: string): boolean {
   // 额外检查每个段是否在有效范围内
   const segments = trimmedValue.split('.')
   return segments.every((segment) => {
-    const num = parseInt(segment, 10)
+    const num = Number.parseInt(segment, 10)
     return num >= 0 && num <= 255
   })
 }
@@ -193,8 +195,8 @@ export function validateEmail(value: string): boolean {
   const trimmedValue = value.trim()
 
   // RFC 5322 标准的简化版邮箱正则
-  const emailRegex =
-    /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
+  const emailRegex
+    = /^[\w.!#$%&'*+/=?^`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*$/i
 
   return emailRegex.test(trimmedValue) && trimmedValue.length <= 254
 }
@@ -212,7 +214,8 @@ export function validateURL(value: string): boolean {
   try {
     new URL(value.trim())
     return true
-  } catch {
+  }
+  catch {
     return false
   }
 }
@@ -230,8 +233,8 @@ export function validateChineseIDCard(value: string): boolean {
   const trimmedValue = value.trim()
 
   // 18位身份证号码正则
-  const idCardRegex =
-    /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/
+  const idCardRegex
+    = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9X]$/i
 
   if (!idCardRegex.test(trimmedValue)) {
     return false
@@ -243,7 +246,7 @@ export function validateChineseIDCard(value: string): boolean {
 
   let sum = 0
   for (let i = 0; i < 17; i++) {
-    sum += parseInt(trimmedValue[i]) * weights[i]
+    sum += Number.parseInt(trimmedValue[i]) * weights[i]
   }
 
   const checkCode = checkCodes[sum % 11]
@@ -272,7 +275,7 @@ export function validateBankCard(value: string): boolean {
   let shouldDouble = false
 
   for (let i = trimmedValue.length - 1; i >= 0; i--) {
-    let digit = parseInt(trimmedValue[i])
+    let digit = Number.parseInt(trimmedValue[i])
 
     if (shouldDouble) {
       digit *= 2

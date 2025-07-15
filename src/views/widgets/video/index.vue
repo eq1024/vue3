@@ -1,28 +1,28 @@
+<script setup lang="ts">
+import lockImg from '@imgs/lock/lock_screen_1.webp'
+import { ref } from 'vue'
+
+// 视频源和封面图片URL
+const videoUrl = ref(
+  '//lf3-static.bytednsdoc.com/obj/eden-cn/nupenuvpxnuvo/xgplayer_doc/xgplayer-demo.mp4',
+)
+const posterUrl = ref(lockImg)
+</script>
+
 <template>
   <div class="page-content">
     <div class="video-container">
       <ArtVideoPlayer
-        playerId="my-video-1"
-        :videoUrl="videoUrl"
-        :posterUrl="posterUrl"
+        player-id="my-video-1"
+        :video-url="videoUrl"
+        :poster-url="posterUrl"
         :autoplay="false"
         :volume="1"
-        :playbackRates="[0.5, 1, 1.5, 2]"
+        :playback-rates="[0.5, 1, 1.5, 2]"
       />
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { ref } from 'vue'
-  import lockImg from '@imgs/lock/lock_screen_1.webp'
-
-  // 视频源和封面图片URL
-  const videoUrl = ref(
-    '//lf3-static.bytednsdoc.com/obj/eden-cn/nupenuvpxnuvo/xgplayer_doc/xgplayer-demo.mp4'
-  )
-  const posterUrl = ref(lockImg)
-</script>
 
 <style scoped>
   .video-container {

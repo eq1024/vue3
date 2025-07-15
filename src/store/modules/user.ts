@@ -1,14 +1,14 @@
+import type { AppRouteRecord } from '@/types/router'
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import { LanguageEnum } from '@/enums/appEnum'
 import { router } from '@/router'
-import { useSettingStore } from './setting'
-import { useWorktabStore } from './worktab'
-import { AppRouteRecord } from '@/types/router'
-import { setPageTitle } from '@/router/utils/utils'
 import { resetRouterState } from '@/router/guards/beforeEach'
 import { RoutesAlias } from '@/router/routesAlias'
+import { setPageTitle } from '@/router/utils/utils'
 import { useMenuStore } from './menu'
+import { useSettingStore } from './setting'
+import { useWorktabStore } from './worktab'
 
 /**
  * 用户状态管理
@@ -150,13 +150,13 @@ export const useUserStore = defineStore(
       setLockStatus,
       setLockPassword,
       setToken,
-      logOut
+      logOut,
     }
   },
   {
     persist: {
       key: 'user',
-      storage: localStorage
-    }
-  }
+      storage: localStorage,
+    },
+  },
 )

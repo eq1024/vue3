@@ -1,3 +1,7 @@
+<script setup lang="ts">
+defineOptions({ name: 'IndexLayout' })
+</script>
+
 <template>
   <!-- 布局容器 -->
   <ArtLayouts>
@@ -21,10 +25,6 @@
     <ArtWatermark />
   </ArtLayouts>
 </template>
-
-<script setup lang="ts">
-  defineOptions({ name: 'IndexLayout' })
-</script>
 
 <style lang="scss" scoped>
   @use './style';
