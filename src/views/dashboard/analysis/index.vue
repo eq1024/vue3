@@ -1,3 +1,16 @@
+<script setup lang="ts">
+import CustomerSatisfaction from './widget/CustomerSatisfaction.vue'
+import SalesMappingByCountry from './widget/SalesMappingByCountry.vue'
+import TargetVsReality from './widget/TargetVsReality.vue'
+import TodaySales from './widget/TodaySales.vue'
+import TopProducts from './widget/TopProducts.vue'
+import TotalRevenue from './widget/TotalRevenue.vue'
+import VisitorInsights from './widget/VisitorInsights.vue'
+import VolumeServiceLevel from './widget/VolumeServiceLevel.vue'
+
+defineOptions({ name: 'Analysis' })
+</script>
+
 <template>
   <div class="analysis-dashboard">
     <el-row :gutter="20">
@@ -34,19 +47,6 @@
     </el-row>
   </div>
 </template>
-
-<script setup lang="ts">
-  import TodaySales from './widget/TodaySales.vue'
-  import VisitorInsights from './widget/VisitorInsights.vue'
-  import TotalRevenue from './widget/TotalRevenue.vue'
-  import CustomerSatisfaction from './widget/CustomerSatisfaction.vue'
-  import TargetVsReality from './widget/TargetVsReality.vue'
-  import TopProducts from './widget/TopProducts.vue'
-  import SalesMappingByCountry from './widget/SalesMappingByCountry.vue'
-  import VolumeServiceLevel from './widget/VolumeServiceLevel.vue'
-
-  defineOptions({ name: 'Analysis' })
-</script>
 
 <style lang="scss" scoped>
   @use './style';

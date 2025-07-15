@@ -1,4 +1,45 @@
 <!-- 图片卡片 -->
+<script setup lang="ts">
+import { ChatLineRound, Picture, View } from '@element-plus/icons-vue'
+
+defineOptions({ name: 'ArtImageCard' })
+
+const props = withDefaults(defineProps<Props>(), {
+  imageUrl: '',
+  title: '',
+  category: '',
+  readTime: '',
+  views: 0,
+  comments: 0,
+  date: '',
+})
+
+const emit = defineEmits<{
+  (e: 'click', card: Props): void
+}>()
+
+interface Props {
+  /** 图片地址 */
+  imageUrl: string
+  /** 标题 */
+  title: string
+  /** 分类 */
+  category?: string
+  /** 阅读时间 */
+  readTime?: string
+  /** 浏览量 */
+  views?: number
+  /** 评论数 */
+  comments?: number
+  /** 日期 */
+  date?: string
+}
+
+function handleClick() {
+  emit('click', props)
+}
+</script>
+
 <template>
   <div class="image-card" @click="handleClick">
     <ElCard :body-style="{ padding: '0px' }" shadow="hover" class="art-custom-card">
@@ -10,20 +51,24 @@
             </div>
           </template>
         </ElImage>
-        <div class="read-time" v-if="props.readTime"> {{ props.readTime }} 阅读 </div>
+        <div v-if="props.readTime" class="read-time">
+          {{ props.readTime }} 阅读
+        </div>
       </div>
 
       <div class="content">
-        <div class="category" v-if="props.category">
+        <div v-if="props.category" class="category">
           {{ props.category }}
         </div>
-        <p class="title">{{ props.title }}</p>
+        <p class="title">
+          {{ props.title }}
+        </p>
         <div class="stats">
-          <span class="views" v-if="props.views">
+          <span v-if="props.views" class="views">
             <ElIcon><View /></ElIcon>
             {{ props.views }}
           </span>
-          <span class="comments" v-if="props.comments">
+          <span v-if="props.comments" class="comments">
             <ElIcon><ChatLineRound /></ElIcon>
             {{ props.comments }}
           </span>
@@ -33,47 +78,6 @@
     </ElCard>
   </div>
 </template>
-
-<script setup lang="ts">
-  import { Picture, View, ChatLineRound } from '@element-plus/icons-vue'
-
-  defineOptions({ name: 'ArtImageCard' })
-
-  interface Props {
-    /** 图片地址 */
-    imageUrl: string
-    /** 标题 */
-    title: string
-    /** 分类 */
-    category?: string
-    /** 阅读时间 */
-    readTime?: string
-    /** 浏览量 */
-    views?: number
-    /** 评论数 */
-    comments?: number
-    /** 日期 */
-    date?: string
-  }
-
-  const props = withDefaults(defineProps<Props>(), {
-    imageUrl: '',
-    title: '',
-    category: '',
-    readTime: '',
-    views: 0,
-    comments: 0,
-    date: ''
-  })
-
-  const emit = defineEmits<{
-    (e: 'click', card: Props): void
-  }>()
-
-  const handleClick = () => {
-    emit('click', props)
-  }
-</script>
 
 <style lang="scss" scoped>
   .image-card {

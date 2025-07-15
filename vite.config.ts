@@ -1,11 +1,13 @@
-import { defineConfig, loadEnv } from 'vite'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
-import path from 'path'
-import viteCompression from 'vite-plugin-compression'
-import Components from 'unplugin-vue-components/vite'
 import AutoImport from 'unplugin-auto-import/vite'
+import IconsResolver from 'unplugin-icons/resolver'
+import Icons from 'unplugin-icons/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-import { fileURLToPath } from 'url'
+import Components from 'unplugin-vue-components/vite'
+import { defineConfig, loadEnv } from 'vite'
+import viteCompression from 'vite-plugin-compression'
 // import viteImagemin from 'vite-plugin-imagemin'
 // import { visualizer } from 'rollup-plugin-visualizer'
 
@@ -22,19 +24,19 @@ export default ({ mode }: { mode: string }) => {
 
   return defineConfig({
     define: {
-      __APP_VERSION__: JSON.stringify(VITE_VERSION)
+      __APP_VERSION__: JSON.stringify(VITE_VERSION),
     },
     base: VITE_BASE_URL,
     server: {
-      port: parseInt(VITE_PORT),
+      port: Number.parseInt(VITE_PORT),
       proxy: {
         '/api': {
           target: VITE_API_URL,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '')
-        }
+          rewrite: path => path.replace(/^\/api/, ''),
+        },
       },
-      host: true
+      host: true,
     },
     // 路径别名
     resolve: {
@@ -46,8 +48,8 @@ export default ({ mode }: { mode: string }) => {
         '@utils': resolvePath('src/utils'),
         '@stores': resolvePath('src/store'),
         '@plugins': resolvePath('src/plugins'),
-        '@styles': resolvePath('src/assets/styles')
-      }
+        '@styles': resolvePath('src/assets/styles'),
+      },
     },
     build: {
       target: 'es2015',
@@ -57,21 +59,21 @@ export default ({ mode }: { mode: string }) => {
       terserOptions: {
         compress: {
           drop_console: true, // 生产环境去除 console
-          drop_debugger: true // 生产环境去除 debugger
-        }
+          drop_debugger: true, // 生产环境去除 debugger
+        },
       },
       rollupOptions: {
         output: {
           manualChunks: {
-            vendor: ['vue', 'vue-router', 'pinia', 'element-plus']
-          }
-        }
+            vendor: ['vue', 'vue-router', 'pinia', 'element-plus'],
+          },
+        },
       },
       dynamicImportVarsOptions: {
         warnOnError: true,
         exclude: [],
-        include: ['src/views/**/*.vue']
-      }
+        include: ['src/views/**/*.vue'],
+      },
     },
     plugins: [
       vue(),
@@ -80,8 +82,8 @@ export default ({ mode }: { mode: string }) => {
         deep: true,
         extensions: ['vue'],
         dirs: ['src/components'], // 自动导入的组件目录
-        resolvers: [ElementPlusResolver()],
-        dts: 'src/types/components.d.ts' // 指定类型声明文件的路径
+        resolvers: [ElementPlusResolver(), IconsResolver()],
+        dts: 'src/types/components.d.ts', // 指定类型声明文件的路径
       }),
       AutoImport({
         imports: ['vue', 'vue-router', '@vueuse/core', 'pinia'],
@@ -91,9 +93,10 @@ export default ({ mode }: { mode: string }) => {
           // 这里先设置成true然后pnpm dev 运行之后会生成 .auto-import.json 文件之后，在改为false
           enabled: true,
           filepath: './.auto-import.json',
-          globalsPropValue: true
-        }
+          globalsPropValue: true,
+        },
       }),
+      Icons({ /* options */ }),
       // 打包分析
       // visualizer({
       //   open: true,
@@ -108,7 +111,7 @@ export default ({ mode }: { mode: string }) => {
         algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
         ext: '.gz', // 压缩后的文件名后缀
         threshold: 10240, // 只有大小大于该值的资源会被处理 10240B = 10KB
-        deleteOriginFile: false // 压缩后是否删除原文件
+        deleteOriginFile: false, // 压缩后是否删除原文件
       }),
       // 图片压缩
       // viteImagemin({
@@ -145,7 +148,7 @@ export default ({ mode }: { mode: string }) => {
       //     ]
       //   }
       // })
-      vueDevTools()
+      vueDevTools(),
     ],
     // 预加载项目必需的组件
     optimizeDeps: {
@@ -233,8 +236,8 @@ export default ({ mode }: { mode: string }) => {
         'file-saver',
         'element-plus/es/components/timeline/style/css',
         'element-plus/es/components/timeline-item/style/css',
-        'vue-img-cutter'
-      ]
+        'vue-img-cutter',
+      ],
     },
     css: {
       preprocessorOptions: {
@@ -243,8 +246,8 @@ export default ({ mode }: { mode: string }) => {
           api: 'modern-compiler',
           additionalData: `
             @use "@styles/variables.scss" as *; @use "@styles/mixin.scss" as *;
-          `
-        }
+          `,
+        },
       },
       postcss: {
         plugins: [
@@ -255,12 +258,12 @@ export default ({ mode }: { mode: string }) => {
                 if (atRule.name === 'charset') {
                   atRule.remove()
                 }
-              }
-            }
-          }
-        ]
-      }
-    }
+              },
+            },
+          },
+        ],
+      },
+    },
   })
 }
 
